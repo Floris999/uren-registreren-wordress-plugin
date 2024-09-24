@@ -1,6 +1,6 @@
-# Urenregistratie Plugin
+# Uren registratie Plugin
 
-The Urenregistratie Plugin is a WordPress plugin that allows users to submit their working hours for different days of the week. Administrators can review the submitted hours and approve or reject them. The status of the submitted hours is then displayed to the users.
+The Uren registratie Plugin is a WordPress plugin that allows users to submit their working hours for different days of the week. Administrators can review the submitted hours and approve or reject them. The status of the submitted hours is then displayed to the users.
 
 ## Features
 
