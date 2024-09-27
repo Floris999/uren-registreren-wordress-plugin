@@ -10,75 +10,73 @@ function urenregistratie_gebruikersformulier()
     $user_name = $current_user->display_name;
     $user_email = $current_user->user_email;
 
-    $melding = '';
     if (isset($_POST['uren_submit'])) {
-        $melding = urenregistratie_verwerk_inzending($current_user->ID);
+        urenregistratie_verwerk_inzending($current_user->ID);
     }
 
     $ingediende_weken = urenregistratie_get_ingediende_weken($current_user->ID);
 
     ob_start();
 ?>
-    <div class="container">
-        <?php if ($melding): ?>
-            <div class="alert alert-info"><?php echo $melding; ?></div>
-        <?php endif; ?>
+    <div>
+        <div class="px-4 sm:px-0">
+            <h3 class="text-base font-semibold leading-7 text-gray-900">Urenregistratie</h3>
+            <p class="mt-1 max-w-2xl text-sm leading-6 text-gray-500">Vul je gewerkte uren in voor de week.</p>
+        </div>
+        <div class="mt-6 border-t border-gray-100">
+            <dl class="divide-y divide-gray-100">
+                <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                    <dt class="text-sm font-medium leading-6 text-gray-900">Naam</dt>
+                    <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0"><?php echo esc_html($user_name); ?></dd>
+                </div>
+                <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                    <dt class="text-sm font-medium leading-6 text-gray-900">E-mailadres</dt>
+                    <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0"><?php echo esc_html($user_email); ?></dd>
+                </div>
+                <?php if (!empty($ingediende_weken)): ?>
+                    <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                        <dt class="text-sm font-medium leading-6 text-gray-900">Ingediende weken</dt>
+                        <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                            <ul class="list-disc list-inside">
+                                <?php foreach ($ingediende_weken as $week): ?>
+                                    <li>Week <?php echo esc_html($week['weeknummer']); ?>: <?php echo esc_html($week['status']); ?></li>
+                                <?php endforeach; ?>
+                            </ul>
+                        </dd>
+                    </div>
+                <?php endif; ?>
+                <form method="post" action="" class="mt-4">
+                    <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                        <dt class="text-sm font-medium leading-6 text-gray-900">
+                            <label for="weeknummer">Weeknummer:</label>
+                        </dt>
+                        <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                            <input type="number" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="weeknummer" name="weeknummer" required>
+                        </dd>
+                    </div>
 
-        <h2 class="mt-4">Urenregistratie voor: <?php echo esc_html($user_name); ?></h2>
-        <p>E-mailadres: <?php echo esc_html($user_email); ?></p>
+                    <?php
+                    $dagen = ['maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag', 'zondag'];
+                    foreach ($dagen as $dag): ?>
+                        <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                            <dt class="text-sm font-medium leading-6 text-gray-900">
+                                <label for="uren_<?php echo $dag; ?>">Uren <?php echo $dag; ?>:</label>
+                            </dt>
+                            <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                                <input type="number" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="uren_<?php echo $dag; ?>" name="uren_<?php echo $dag; ?>" min="0" max="8">
+                            </dd>
+                        </div>
+                    <?php endforeach; ?>
 
-        <?php if (!empty($ingediende_weken)): ?>
-            <h4>Ingediende weken:</h4>
-            <ul>
-                <?php foreach ($ingediende_weken as $week): ?>
-                    <li>Week <?php echo esc_html($week['weeknummer']); ?>: <?php echo esc_html($week['status']); ?></li>
-                <?php endforeach; ?>
-            </ul>
-        <?php endif; ?>
-
-        <form method="post" class="mt-4">
-            <div class="form-group">
-                <label for="weeknummer">Weeknummer:</label>
-                <input type="number" class="form-control" id="weeknummer" name="weeknummer" required>
-            </div>
-
-            <div class="form-group">
-                <label for="uren_maandag">Uren maandag:</label>
-                <input type="number" class="form-control" id="uren_maandag" name="uren_maandag" min="0" max="24" required>
-            </div>
-
-            <div class="form-group">
-                <label for="uren_dinsdag">Uren dinsdag:</label>
-                <input type="number" class="form-control" id="uren_dinsdag" name="uren_dinsdag" min="0" max="24" required>
-            </div>
-
-            <div class="form-group">
-                <label for="uren_woensdag">Uren woensdag:</label>
-                <input type="number" class="form-control" id="uren_woensdag" name="uren_woensdag" min="0" max="24" required>
-            </div>
-
-            <div class="form-group">
-                <label for="uren_donderdag">Uren donderdag:</label>
-                <input type="number" class="form-control" id="uren_donderdag" name="uren_donderdag" min="0" max="24" required>
-            </div>
-
-            <div class="form-group">
-                <label for="uren_vrijdag">Uren vrijdag:</label>
-                <input type="number" class="form-control" id="uren_vrijdag" name="uren_vrijdag" min="0" max="24" required>
-            </div>
-
-            <div class="form-group">
-                <label for="uren_zaterdag">Uren zaterdag:</label>
-                <input type="number" class="form-control" id="uren_zaterdag" name="uren_zaterdag" min="0" max="24" required>
-            </div>
-
-            <div class="form-group">
-                <label for="uren_zondag">Uren zondag:</label>
-                <input type="number" class="form-control" id="uren_zondag" name="uren_zondag" min="0" max="24" required>
-            </div>
-
-            <button type="submit" name="uren_submit" class="btn btn-primary">Uren registreren</button>
-        </form>
+                    <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                        <dt class="text-sm font-medium leading-6 text-gray-900"></dt>
+                        <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                            <button type="submit" name="uren_submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Uren registreren</button>
+                        </dd>
+                    </div>
+                </form>
+            </dl>
+        </div>
     </div>
 <?php
 
@@ -116,6 +114,10 @@ function urenregistratie_verwerk_inzending($user_id)
         )
     ));
 
+    if (!empty($existing_posts)) {
+        return 'Je hebt al uren ingediend voor week ' . esc_html($weeknummer) . '.';
+    }
+
     $uren_post = array(
         'post_title' => 'Uren Week ' . $weeknummer . ' - Gebruiker ' . $user_id,
         'post_content' => json_encode($uren),
@@ -129,8 +131,8 @@ function urenregistratie_verwerk_inzending($user_id)
         ),
     );
 
-    // Sla de post op
-    // $post_id = wp_insert_post($uren_post);
+    wp_insert_post($uren_post);
+    header('Location: /');
 }
 
 function urenregistratie_get_ingediende_weken($user_id)
@@ -158,3 +160,4 @@ function urenregistratie_get_ingediende_weken($user_id)
 
     return $weken;
 }
+?>
