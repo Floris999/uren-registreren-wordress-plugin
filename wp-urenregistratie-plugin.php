@@ -25,12 +25,9 @@ function urenregistratie_plugin_deactivatie()
 }
 register_deactivation_hook(__FILE__, 'urenregistratie_plugin_deactivatie');
 
-function urenregistratie_enqueue_bootstrap()
+function urenregistratie_enqueue_tailwind()
 {
-    // Bootstrap CSS
-    wp_enqueue_style('bootstrap-css', 'https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css');
-
-    // Bootstrap JS
-    wp_enqueue_script('bootstrap-js', 'https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js', array('jquery'), null, true);
+    // Tailwind CSS
+    wp_enqueue_style('tailwind-css', 'https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css');
 }
-add_action('wp_enqueue_scripts', 'urenregistratie_enqueue_bootstrap');
+add_action('wp_enqueue_scripts', 'urenregistratie_enqueue_tailwind');
