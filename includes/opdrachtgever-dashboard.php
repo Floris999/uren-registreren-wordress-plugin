@@ -12,30 +12,31 @@ function urenregistratie_admin_menu()
 }
 add_action('admin_menu', 'urenregistratie_admin_menu');
 
-
 function urenregistratie_admin_page()
 {
-
     if (isset($_POST['update_status'])) {
         $post_id = intval($_POST['post_id']);
         $status = sanitize_text_field($_POST['status']);
         update_post_meta($post_id, 'status', $status);
     }
 
-
     if (isset($_POST['delete_post'])) {
         $post_id = intval($_POST['post_id']);
         wp_delete_post($post_id, true);
     }
 
+    if (isset($_POST['save_email'])) {
+        $email = sanitize_email($_POST['notification_email']);
+        update_option('urenregistratie_notification_email', $email);
+    }
 
+    // Query om alle 'uren' posts op te halen
     $args = array(
         'post_type' => 'uren',
         'posts_per_page' => -1,
         'post_status' => 'publish'
     );
     $uren_query = new WP_Query($args);
-
 
     echo '<div class="wrap">';
     echo '<h1>Uren Overzicht</h1>';
@@ -55,7 +56,6 @@ function urenregistratie_admin_page()
       </thead>';
         echo '<tbody>';
 
-
         $unique_weken = array();
 
         while ($uren_query->have_posts()) {
@@ -66,13 +66,11 @@ function urenregistratie_admin_page()
             $uren = get_post_meta($post_id, 'uren', true);
             $status = get_post_meta($post_id, 'status', true) ?: 'in afwachting';
 
-
             if (in_array($weeknummer, $unique_weken)) {
                 continue;
             }
 
             $unique_weken[] = $weeknummer;
-
             $user_info = get_userdata($user_id);
 
             if ($user_info) {
@@ -107,7 +105,7 @@ function urenregistratie_admin_page()
                         </form>
                         <form method="post" style="display:inline;">
                             <input type="hidden" name="post_id" value="' . esc_attr($post_id) . '">
-                            <button type="submit" name="delete_post" class="button button-danger" onclick="return confirm(\'Weet je zeker dat je deze uren reeks wilt verwijderen?\')">Verwijderen</button>
+                            <button type="submit" name="delete_post" class="button button-danger" onclick="return confirm(\'Weet je zeker dat je deze uren wilt verwijderen?\')">Verwijderen</button>
                         </form>
                     </td>';
                     echo '</tr>';
@@ -121,6 +119,20 @@ function urenregistratie_admin_page()
     } else {
         echo '<p>Geen uren gevonden.</p>';
     }
+
+    // Instellingen sectie
+    echo '<h2>Instellingen</h2>';
+    echo '<form method="post">';
+    $saved_email = get_option('urenregistratie_notification_email', '');
+    echo '<table class="form-table">';
+    echo '<tr>';
+    echo '<th scope="row"><label for="notification_email">E-mailadres voor uren keuren</label></th>';
+    echo '<td><input type="email" name="notification_email" value="' . esc_attr($saved_email) . '" class="regular-text"></td>';
+    echo '</tr>';
+    echo '</table>';
+    echo '<p class="submit"><button type="submit" name="save_email" class="button button-primary">Opslaan</button></p>';
+    echo '</form>';
+
     echo '</div>';
     wp_reset_postdata();
 }

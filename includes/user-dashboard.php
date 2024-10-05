@@ -11,7 +11,7 @@ function urenregistratie_gebruikersformulier()
     $user_email = $current_user->user_email;
 
     if (isset($_POST['uren_submit'])) {
-        urenregistratie_verwerk_inzending($current_user->ID);
+        urenregistratie_verwerk_inzending($current_user->ID, $user_email);
     }
 
     $ingediende_weken = urenregistratie_get_ingediende_weken($current_user->ID);
@@ -85,7 +85,7 @@ function urenregistratie_gebruikersformulier()
 
 add_shortcode('urenregistratie_form', 'urenregistratie_gebruikersformulier');
 
-function urenregistratie_verwerk_inzending($user_id)
+function urenregistratie_verwerk_inzending($user_id, $user_email)
 {
     $weeknummer = sanitize_text_field($_POST['weeknummer']);
     $uren = array(
@@ -128,6 +128,7 @@ function urenregistratie_verwerk_inzending($user_id)
             'weeknummer' => $weeknummer,
             'uren' => $uren,
             'status' => 'in afwachting',
+            'kandidaat_email' => $user_email,
         ),
     );
 
