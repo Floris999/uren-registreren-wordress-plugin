@@ -8,9 +8,9 @@ Author: Dintech & FVD
 
 if (!defined('ABSPATH')) exit;
 
-require_once plugin_dir_path(__FILE__) . 'includes/email-verzending.php';
+require_once plugin_dir_path(__FILE__) . 'includes/email_verzending.php';
 require_once plugin_dir_path(__FILE__) . 'includes/opdrachtgever-dashboard.php';
-require_once plugin_dir_path(__FILE__) . 'includes/user-dashboard.php';
+require_once plugin_dir_path(__FILE__) . 'includes/user_dashboard.php';
 require_once plugin_dir_path(__FILE__) . 'includes/notificaties.php';
 
 function urenregistratie_plugin_activatie()
