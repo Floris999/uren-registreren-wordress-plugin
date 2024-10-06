@@ -1,9 +1,9 @@
 <?php
 /*
 Plugin Name: Urenregistratie Plugin
-Description: Een plugin voor het verzenden van uren naar opdrachtgever(s), inclusief notificaties en een opdrachtgever dashboard.
+Description: Een plugin voor het verzenden van uren naar opdrachtgever(s), inclusief een opdrachtgever en beheerder dashboard.
 Version: 1.0
-Author: Dintech & FVD
+Author: Dintech
 */
 
 if (!defined('ABSPATH')) exit;

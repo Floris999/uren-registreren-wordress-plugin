@@ -1,47 +1,67 @@
 # Uren registratie Plugin
 
-The Uren registratie Plugin is a WordPress plugin that allows users to submit their working hours for different days of the week. Administrators can review the submitted hours and approve or reject them. The status of the submitted hours is then displayed to the users.
+De Uren registratie Plugin is een WordPress-plugin waarmee gebruikers hun gewerkte uren voor verschillende dagen van de week kunnen indienen. Administrators en opdrachtgevers kunnen de ingediende uren bekijken en goedkeuren of afkeuren. De status van de ingediende uren wordt vervolgens aan de gebruikers getoond.
 
 ## Features
 
-- Users can submit their working hours for each day of the week.
-- Administrators can view all submitted hours in the admin dashboard.
-- Administrators can approve or reject the submitted hours.
-- Users can see the status of their submitted hours (approved, rejected, or pending).
+- Gebruikers kunnen hun gewerkte uren voor elke dag van de week indienen.
+- Administrators kunnen alle ingediende uren bekijken in het admin dashboard.
+- Administrators kunnen de ingediende uren goedkeuren of afkeuren.
+- Gebruikers kunnen de status van hun ingediende uren zien (goedgekeurd, afgekeurd of in afwachting).
+- Aangepaste inlogpagina met Tailwind CSS-styling.
+- Redirects voor gebruikers met de rol `opdrachtgever` of `kandidaat` naar de homepage na het inloggen en blokkeren van toegang tot het WordPress-dashboard en profielpagina.
 
-## Installation
+## Installatie
 
-1. Download the plugin files and upload them to the `/wp-content/plugins/urenregistratie` directory, or install the plugin through the WordPress plugins screen directly.
-2. Activate the plugin through the 'Plugins' screen in WordPress.
+1. Download de pluginbestanden en upload ze naar de `/wp-content/plugins/urenregistratie` directory, of installeer de plugin direct via het WordPress plugins scherm.
+2. Activeer de plugin via het 'Plugins' scherm in WordPress.
 
-## Shortcode
+## Shortcodes
 
-The `[urenregistratie_form]` shortcode displays a form where users can submit their working hours. The form includes fields for each day of the week and a submit button.
+### `[urenregistratie_form]`
 
-## Functions
+De `[urenregistratie_form]` shortcode toont een formulier waarmee gebruikers hun gewerkte uren kunnen indienen. Het formulier bevat velden voor elke dag van de week en een verzendknop.
+
+### `[opdrachtgever_dashboard]`
+
+De `[opdrachtgever_dashboard]` shortcode toont een dashboard voor opdrachtgevers waarin zij de ingediende uren van hun kandidaten kunnen bekijken en goedkeuren of afkeuren.
+
+## Functies
 
 ### `urenregistratie_gebruikersformulier()`
 
-This function generates the form for users to submit their working hours. It checks if the user is logged in, processes the form submission, and displays the submitted weeks with their statuses.
+Deze functie genereert het formulier waarmee gebruikers hun gewerkte uren kunnen indienen. Het controleert of de gebruiker is ingelogd, verwerkt de formulierinzending en toont de ingediende weken met hun statussen.
 
 ### `urenregistratie_verwerk_inzending($user_id)`
 
-This function processes the form submission and saves the submitted hours as a custom post type 'uren'. It also sets the initial status of the submission to 'pending'.
+Deze functie verwerkt de formulierinzending en slaat de ingediende uren op als een custom post type 'uren'. Het stelt ook de initiële status van de inzending in op 'in afwachting'.
 
 ### `urenregistratie_get_ingediende_weken($user_id)`
 
-This function retrieves the submitted weeks for the logged-in user and returns an array of weeks with their statuses.
+Deze functie haalt de ingediende weken op voor de ingelogde gebruiker en retourneert een array van weken met hun statussen.
+
+### `urenregistratie_opdrachtgever_dashboard()`
+
+Deze functie genereert het dashboard voor opdrachtgevers waarin zij de ingediende uren van hun kandidaten kunnen bekijken en goedkeuren of afkeuren. Het controleert of de gebruiker is ingelogd en de juiste rol heeft, en toont vervolgens een tabel met de ingediende uren.
 
 ## Admin Dashboard
 
-In the admin dashboard, administrators can view all submitted hours in a table. Each row in the table includes the user's name, email, week number, submitted hours, total hours, status, and action buttons to approve or reject the submission.
+In het admin dashboard kunnen administrators alle ingediende uren bekijken in een tabel. Elke rij in de tabel bevat de naam van de gebruiker, e-mailadres, weeknummer, ingediende uren, totale uren, status en actieknoppen om de inzending goed te keuren of af te keuren.
+
+## Aangepaste Inlogpagina
+
+De plugin bevat een aangepaste inlogpagina met Tailwind CSS-styling. De standaard WordPress-inlogpagina en taalkeuze worden verborgen.
+
+## Redirects
+
+Gebruikers met de rol `opdrachtgever` of `kandidaat` worden na het inloggen altijd doorgestuurd naar de homepage (`/`). Deze gebruikers hebben geen toegang tot het WordPress-dashboard (`/wp-admin/index.php`) of hun profielpagina (`/wp-admin/profile.php`).
 
 ## Changelog
 
 ### 1.0.0
 
-- Initial release.
+- Eerste release.
 
 ## Support
 
-For support, please contact the plugin author.
+Voor ondersteuning, neem contact op met de auteur van de plugin.
