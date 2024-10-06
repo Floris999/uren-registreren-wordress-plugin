@@ -10,9 +10,11 @@ if (!defined('ABSPATH')) exit;
 
 require_once plugin_dir_path(__FILE__) . 'includes/email_verzending.php';
 require_once plugin_dir_path(__FILE__) . 'includes/admin_dashboard.php';
-require_once plugin_dir_path(__FILE__) . 'includes/user_dashboard.php';
+require_once plugin_dir_path(__FILE__) . 'includes/kandidaat_dashboard.php';
 require_once plugin_dir_path(__FILE__) . 'includes/notificaties.php';
 require_once plugin_dir_path(__FILE__) . 'includes/opdrachtgever_dashboard.php';
+require_once plugin_dir_path(__FILE__) . 'includes/wordpress_login_screen.php';
+include_once plugin_dir_path(__FILE__) . 'redirects.php';
 
 function urenregistratie_plugin_activatie()
 {
