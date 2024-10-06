@@ -8,7 +8,7 @@ function urenregistratie_opdrachtgever_dashboard()
 
     $current_user = wp_get_current_user();
 
-    if (!in_array('opdrachtgever', $current_user->roles)) {
+    if (!in_array('opdrachtgever', $current_user->roles) && !in_array('administrator', $current_user->roles)) {
         return '<p>Je hebt geen toestemming om deze pagina te bekijken.</p>';
     }
 
@@ -56,8 +56,9 @@ function urenregistratie_opdrachtgever_dashboard()
 
     ob_start();
 ?>
-    <div class="flex flex-row mb-1 sm:mb-0">
+    <div class="flex flex-col mb-1 sm:mb-0">
         <h1 class="text-2xl leading-tight">Hallo <?php echo esc_html($current_user->display_name); ?></h1>
+        <p>De volgende uren zijn door jouw kandidaten geregistreerd.</p>
     </div>
     <table>
         <thead>
