@@ -49,7 +49,7 @@ function urenregistratie_admin_page()
     $uren_query = new WP_Query($args);
 
     echo '<div class="wrap">';
-    echo '<h1>Uren Overzicht</h1>';
+    echo '<h1>Urenoverzicht</h1>';
 
     if ($uren_query->have_posts()) {
         echo '<table class="wp-list-table widefat fixed striped">';
@@ -211,7 +211,7 @@ function urenregistratie_admin_page()
     $saved_email = get_option('urenregistratie_notification_email', '');
     echo '<table class="form-table">';
     echo '<tr>';
-    echo '<th scope="row"><label for="notification_email">E-mailadres voor uren keuren</label></th>';
+    echo '<th scope="row"><label for="notification_email">Notificatie E-mailadres</label></th>';
     echo '<td><input type="email" name="notification_email" value="' . esc_attr($saved_email) . '" class="regular-text"></td>';
     echo '</tr>';
     echo '</table>';
