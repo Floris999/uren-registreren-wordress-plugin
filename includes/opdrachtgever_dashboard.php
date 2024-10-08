@@ -17,12 +17,10 @@ function urenregistratie_opdrachtgever_dashboard()
         $status = sanitize_text_field($_POST['status']);
         update_post_meta($post_id, 'status', $status);
 
-        // Redirect to prevent form resubmission
         header('Location: ' . $_SERVER['REQUEST_URI']);
         exit;
     }
 
-    // Haal alle 'Kandidaat' gebruikers op die aan de ingelogde 'Opdrachtgever' zijn gekoppeld
     $kandidaat_users = get_users(array(
         'role' => 'kandidaat',
         'meta_query' => array(
@@ -39,7 +37,6 @@ function urenregistratie_opdrachtgever_dashboard()
         return '<p>Er zijn nog geen kandidaten toegevoegd.</p>';
     }
 
-    // Query om alle 'uren' posts op te halen die behoren tot de gekoppelde 'Kandidaat' gebruikers
     $args = array(
         'post_type' => 'uren',
         'posts_per_page' => -1,
