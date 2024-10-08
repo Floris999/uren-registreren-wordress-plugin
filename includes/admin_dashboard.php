@@ -41,7 +41,6 @@ function urenregistratie_admin_page()
         delete_user_meta($kandidaat_id, 'opdrachtgever_id');
     }
 
-    // Query om alle 'uren' posts op te halen
     $args = array(
         'post_type' => 'uren',
         'posts_per_page' => -1,
@@ -89,7 +88,6 @@ function urenregistratie_admin_page()
             if ($user_info) {
                 $naam = $user_info->display_name;
 
-                // Haal de opdrachtgever op die aan deze kandidaat is gekoppeld
                 $opdrachtgever_id = get_user_meta($user_id, 'opdrachtgever_id', true);
                 $opdrachtgever_name = 'Nog geen opdrachtgever gekoppeld';
                 if ($opdrachtgever_id) {
@@ -143,7 +141,6 @@ function urenregistratie_admin_page()
         echo '<p>Geen uren gevonden.</p>';
     }
 
-    // Koppel opdrachtgevers sectie
     echo '<h2>Koppel opdrachtgevers</h2>';
     echo '<table class="wp-list-table widefat fixed striped">';
     echo '<thead>
@@ -155,10 +152,8 @@ function urenregistratie_admin_page()
     </thead>';
     echo '<tbody>';
 
-    // Haal alle gebruikers met de rol 'opdrachtgever' op
     $opdrachtgever_users = get_users(array('role' => 'opdrachtgever'));
 
-    // Haal alle gebruikers met de rol 'kandidaat' op
     $kandidaat_users = get_users(array('role' => 'kandidaat'));
 
     foreach ($opdrachtgever_users as $opdrachtgever) {
@@ -211,7 +206,6 @@ function urenregistratie_admin_page()
     echo '</div>';
     wp_reset_postdata();
 
-    // Instellingen sectie
     echo '<h2>Instellingen</h2>';
     echo '<form method="post">';
     $saved_email = get_option('urenregistratie_notification_email', '');
