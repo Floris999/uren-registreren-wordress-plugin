@@ -1,29 +1,46 @@
 <?php
 
-function urenregistratie_admin_menu()
+function hours_registration_admin_menu()
 {
     add_menu_page(
         'Uren Overzicht',
         'Uren Overzicht',
         'manage_options',
         'uren-overzicht',
-        'urenregistratie_admin_page',
-        'dashicons-clock',
+        'hours_registration_admin_page',
+        'dashicons-clock'
     );
 }
-add_action('admin_menu', 'urenregistratie_admin_menu');
+add_action('admin_menu', 'hours_registration_admin_menu');
 
-function urenregistratie_admin_page()
+function get_start_and_end_date($week, $year)
 {
+    $dto = new DateTime();
+    $dto->setISODate($year, $week);
+    $start_date = $dto->format('Y-m-d');
+    $dto->modify('+6 days');
+    $end_date = $dto->format('Y-m-d');
+    return array($start_date, $end_date);
+}
+
+function hours_registration_admin_page()
+{
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'uren';
+
     if (isset($_POST['update_status'])) {
-        $post_id = intval($_POST['post_id']);
+        $entry_id = intval($_POST['entry_id']);
         $status = sanitize_text_field($_POST['status']);
-        update_post_meta($post_id, 'status', $status);
+        $wpdb->update(
+            $table_name,
+            array('status' => $status),
+            array('id' => $entry_id)
+        );
     }
 
-    if (isset($_POST['delete_post'])) {
-        $post_id = intval($_POST['post_id']);
-        wp_delete_post($post_id, true);
+    if (isset($_POST['delete_entry'])) {
+        $entry_id = intval($_POST['entry_id']);
+        $wpdb->delete($table_name, array('id' => $entry_id));
     }
 
     if (isset($_POST['save_email'])) {
@@ -42,22 +59,18 @@ function urenregistratie_admin_page()
         delete_user_meta($kandidaat_id, 'opdrachtgever_id');
     }
 
-    $args = array(
-        'post_type' => 'uren',
-        'posts_per_page' => -1,
-        'post_status' => 'publish'
-    );
-    $uren_query = new WP_Query($args);
+    $results = $wpdb->get_results("SELECT * FROM $table_name", ARRAY_A);
 
     echo '<div class="wrap">';
     echo '<h1>Urenoverzicht</h1>';
 
-    if ($uren_query->have_posts()) {
+    if (!empty($results)) {
         echo '<table class="wp-list-table widefat fixed striped">';
         echo '<thead>
         <tr>
             <th>Naam</th>
             <th>Weeknummer</th>
+            <th>Weekdatum</th>
             <th>Ingediende uren</th>
             <th>Totaal uren</th>
             <th>Status</th>
@@ -70,14 +83,13 @@ function urenregistratie_admin_page()
 
         $unique_weken = array();
 
-        while ($uren_query->have_posts()) {
-            $uren_query->the_post();
-            $post_id = get_the_ID();
-            $user_id = get_post_meta($post_id, 'user_id', true);
-            $weeknummer = get_post_meta($post_id, 'weeknummer', true);
-            $uren = get_post_meta($post_id, 'uren', true);
-            $status = get_post_meta($post_id, 'status', true) ?: 'in afwachting';
-            $datum_aangevraagd = get_the_date('d-m-Y', $post_id);
+        foreach ($results as $row) {
+            $entry_id = $row['id'];
+            $user_id = $row['user_id'];
+            $weeknummer = $row['weeknummer'];
+            $uren = json_decode($row['uren'], true);
+            $status = $row['status'] ?: 'in afwachting';
+            $datum_aangevraagd = date('d-m-Y', strtotime($row['date']));
 
             if (in_array($weeknummer, $unique_weken)) {
                 continue;
@@ -106,9 +118,13 @@ function urenregistratie_admin_page()
                         $totaal_uren += (int)$uren_per_dag;
                     }
 
+                    // Bereken de begin- en einddatum van de week
+                    list($start_date, $end_date) = get_start_and_end_date($weeknummer, date('Y'));
+
                     echo '<tr>';
                     echo '<td>' . esc_html($naam) . '</td>';
                     echo '<td>' . esc_html($weeknummer) . '</td>';
+                    echo '<td>' . esc_html($start_date) . ' - ' . esc_html($end_date) . '</td>';
                     echo '<td>' . $ingediende_uren . '</td>';
                     echo '<td>' . esc_html($totaal_uren) . '</td>';
                     echo '<td>' . esc_html($status) . '</td>';
@@ -116,23 +132,23 @@ function urenregistratie_admin_page()
                     echo '<td>' . esc_html($datum_aangevraagd) . '</td>';
                     echo '<td>
                         <form method="post" style="display:inline;">
-                            <input type="hidden" name="post_id" value="' . esc_attr($post_id) . '">
+                            <input type="hidden" name="entry_id" value="' . esc_attr($entry_id) . '">
                             <input type="hidden" name="status" value="goedgekeurd">
                             <button type="submit" name="update_status" class="button button-primary">Goedkeuren</button>
                         </form>
                         <form method="post" style="display:inline;">
-                            <input type="hidden" name="post_id" value="' . esc_attr($post_id) . '">
+                            <input type="hidden" name="entry_id" value="' . esc_attr($entry_id) . '">
                             <input type="hidden" name="status" value="afgekeurd">
                             <button type="submit" name="update_status" class="button button-secondary">Afkeuren</button>
                         </form>
                         <form method="post" style="display:inline;">
-                            <input type="hidden" name="post_id" value="' . esc_attr($post_id) . '">
-                            <button type="submit" name="delete_post" class="button button-danger" onclick="return confirm(\'Weet je zeker dat je deze uren wilt verwijderen?\')">Verwijderen</button>
+                            <input type="hidden" name="entry_id" value="' . esc_attr($entry_id) . '">
+                            <button type="submit" name="delete_entry" class="button button-danger" onclick="return confirm(\'Weet je zeker dat je deze uren wilt verwijderen?\')">Verwijderen</button>
                         </form>
                     </td>';
                     echo '</tr>';
                 } else {
-                    echo '<tr><td colspan="8">Ongeldige gegevens gevonden.</td></tr>';
+                    echo '<tr><td colspan="9">Ongeldige gegevens gevonden.</td></tr>';
                 }
             }
         }
@@ -205,7 +221,6 @@ function urenregistratie_admin_page()
     echo '</table>';
 
     echo '</div>';
-    wp_reset_postdata();
 
     echo '<h2>Instellingen</h2>';
     echo '<form method="post">';

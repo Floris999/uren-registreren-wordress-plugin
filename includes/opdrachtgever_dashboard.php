@@ -1,6 +1,18 @@
 <?php
 
-function urenregistratie_opdrachtgever_dashboard()
+if (!function_exists('get_start_and_end_date')) {
+    function get_start_and_end_date($week, $year)
+    {
+        $dto = new DateTime();
+        $dto->setISODate($year, $week);
+        $start_date = $dto->format('Y-m-d');
+        $dto->modify('+6 days');
+        $end_date = $dto->format('Y-m-d');
+        return array($start_date, $end_date);
+    }
+}
+
+function hours_registration_client_dashboard()
 {
     if (!is_user_logged_in()) {
         return '<p>Je moet ingelogd zijn om dit overzicht te bekijken.</p>';
@@ -12,10 +24,17 @@ function urenregistratie_opdrachtgever_dashboard()
         return '<p>Je hebt geen toestemming om deze pagina te bekijken.</p>';
     }
 
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'uren';
+
     if (isset($_POST['update_status'])) {
-        $post_id = intval($_POST['post_id']);
+        $entry_id = intval($_POST['entry_id']);
         $status = sanitize_text_field($_POST['status']);
-        update_post_meta($post_id, 'status', $status);
+        $wpdb->update(
+            $table_name,
+            array('status' => $status),
+            array('id' => $entry_id)
+        );
 
         header('Location: ' . $_SERVER['REQUEST_URI']);
         exit;
@@ -37,19 +56,10 @@ function urenregistratie_opdrachtgever_dashboard()
         return '<p>Er zijn nog geen kandidaten toegevoegd.</p>';
     }
 
-    $args = array(
-        'post_type' => 'uren',
-        'posts_per_page' => -1,
-        'post_status' => 'publish',
-        'meta_query' => array(
-            array(
-                'key' => 'user_id',
-                'value' => $kandidaat_user_ids,
-                'compare' => 'IN'
-            )
-        )
+    $results = $wpdb->get_results(
+        "SELECT * FROM $table_name WHERE user_id IN (" . implode(',', array_map('intval', $kandidaat_user_ids)) . ")",
+        ARRAY_A
     );
-    $uren_query = new WP_Query($args);
 
     ob_start();
 ?>
@@ -62,6 +72,7 @@ function urenregistratie_opdrachtgever_dashboard()
             <tr>
                 <th class="px-6 py-4 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase">Naam</th>
                 <th class="px-6 py-4 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase">Weeknummer</th>
+                <th class="px-6 py-4 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase">Weekdatum</th>
                 <th class="px-6 py-4 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase">Ingediende uren</th>
                 <th class="px-6 py-4 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase">Totaal uren</th>
                 <th class="px-6 py-4 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase">Status</th>
@@ -71,15 +82,14 @@ function urenregistratie_opdrachtgever_dashboard()
         </thead>
         <tbody>
             <?php
-            if ($uren_query->have_posts()) {
-                while ($uren_query->have_posts()) {
-                    $uren_query->the_post();
-                    $post_id = get_the_ID();
-                    $user_id = get_post_meta($post_id, 'user_id', true);
-                    $weeknummer = get_post_meta($post_id, 'weeknummer', true);
-                    $uren = get_post_meta($post_id, 'uren', true);
-                    $status = get_post_meta($post_id, 'status', true) ?: 'in afwachting';
-                    $datum_aangevraagd = get_the_date('d-m-Y', $post_id);
+            if (!empty($results)) {
+                foreach ($results as $row) {
+                    $entry_id = $row['id'];
+                    $user_id = $row['user_id'];
+                    $weeknummer = $row['weeknummer'];
+                    $uren = json_decode($row['uren'], true);
+                    $status = $row['status'] ?: 'in afwachting';
+                    $datum_aangevraagd = isset($row['date']) ? date('d-m-Y', strtotime($row['date'])) : 'Onbekend';
 
                     $user_info = get_userdata($user_id);
                     if ($user_info && in_array('kandidaat', $user_info->roles) && in_array($user_id, $kandidaat_user_ids)) {
@@ -92,23 +102,25 @@ function urenregistratie_opdrachtgever_dashboard()
                                 $ingediende_uren .= ucfirst($dag) . ': ' . esc_html($uren_per_dag) . ' uur<br>';
                                 $totaal_uren += (int)$uren_per_dag;
                             }
+                            list($start_date, $end_date) = get_start_and_end_date($weeknummer, date('Y'));
             ?>
                             <tr>
-                                <td class="px-6 py-4 border-b border-gray-200 bg-white text-sm"><?php echo esc_html($naam); ?></td>
-                                <td class="px-6 py-4 border-b border-gray-200 bg-white text-sm"><?php echo esc_html($weeknummer); ?></td>
-                                <td class="px-6 py-4 border-b border-gray-200 bg-white text-sm"><?php echo $ingediende_uren; ?></td>
-                                <td class="px-6 py-4 border-b border-gray-200 bg-white text-sm"><?php echo esc_html($totaal_uren); ?></td>
-                                <td class="px-6 py-4 border-b border-gray-200 bg-white text-sm"><?php echo esc_html($status); ?></td>
-                                <td class="px-6 py-4 border-b border-gray-200 bg-white text-sm"><?php echo esc_html($datum_aangevraagd); ?></td>
-                                <td class="px-6 py-4 border-b border-gray-200 bg-white text-sm">
+                                <td class="text-sm"><?php echo esc_html($naam); ?></td>
+                                <td class="text-center text-sm"><?php echo esc_html($weeknummer); ?></td>
+                                <td class="text-sm"><?php echo esc_html($start_date) . ' - ' . esc_html($end_date); ?></td>
+                                <td class="text-sm"><?php echo $ingediende_uren; ?></td>
+                                <td class="text-center text-sm"><?php echo esc_html($totaal_uren); ?></td>
+                                <td class="text-center text-sm"><?php echo esc_html($status); ?></td>
+                                <td class="text-center text-sm"><?php echo esc_html($datum_aangevraagd); ?></td>
+                                <td class="text-center text-sm">
                                     <div class="flex space-x-2">
                                         <form method="post" style="display:inline;">
-                                            <input type="hidden" name="post_id" value="<?php echo esc_attr($post_id); ?>">
+                                            <input type="hidden" name="entry_id" value="<?php echo esc_attr($entry_id); ?>">
                                             <input type="hidden" name="status" value="goedgekeurd">
                                             <button type="submit" name="update_status" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Goedkeuren</button>
                                         </form>
                                         <form method="post" style="display:inline;">
-                                            <input type="hidden" name="post_id" value="<?php echo esc_attr($post_id); ?>">
+                                            <input type="hidden" name="entry_id" value="<?php echo esc_attr($entry_id); ?>">
                                             <input type="hidden" name="status" value="afgekeurd">
                                             <button type="submit" name="update_status" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Afkeuren</button>
                                         </form>
@@ -122,7 +134,7 @@ function urenregistratie_opdrachtgever_dashboard()
             } else {
                 ?>
                 <tr>
-                    <td colspan="7" class="px-6 py-4 border-b border-gray-200 bg-white text-sm">Geen uren gevonden.</td>
+                    <td colspan="8" class="px-6 py-4 border-b border-gray-200 bg-white text-sm">Geen uren gevonden.</td>
                 </tr>
             <?php
             }
@@ -135,4 +147,4 @@ function urenregistratie_opdrachtgever_dashboard()
     return ob_get_clean();
 }
 
-add_shortcode('opdrachtgever_dashboard', 'urenregistratie_opdrachtgever_dashboard');
+add_shortcode('opdrachtgever_dashboard', 'hours_registration_client_dashboard');

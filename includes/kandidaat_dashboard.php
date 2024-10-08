@@ -1,6 +1,6 @@
 <?php
 
-function urenregistratie_gebruikersformulier()
+function hours_registration_user_form()
 {
     if (!is_user_logged_in()) {
         return '<p>Je moet ingelogd zijn om je uren in te dienen.</p>';
@@ -10,16 +10,15 @@ function urenregistratie_gebruikersformulier()
     $user_name = $current_user->display_name;
     $user_email = $current_user->user_email;
 
-
     if (!in_array('kandidaat', $current_user->roles) && !in_array('administrator', $current_user->roles)) {
         return '<p>Je hebt geen toestemming om deze pagina te bekijken.</p>';
     }
 
     if (isset($_POST['uren_submit'])) {
-        urenregistratie_verwerk_inzending($current_user->ID, $user_email);
+        process_hours_submission($current_user->ID, $user_email);
     }
 
-    $ingediende_weken = urenregistratie_get_ingediende_weken($current_user->ID);
+    $ingediende_weken = get_submitted_weeks($current_user->ID);
 
     ob_start();
 ?>
@@ -88,10 +87,13 @@ function urenregistratie_gebruikersformulier()
     return ob_get_clean();
 }
 
-add_shortcode('urenregistratie_form', 'urenregistratie_gebruikersformulier');
+add_shortcode('urenregistratie_form', 'hours_registration_user_form');
 
-function urenregistratie_verwerk_inzending($user_id, $user_email)
+function process_hours_submission($user_id, $user_email)
 {
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'uren';
+
     $weeknummer = sanitize_text_field($_POST['weeknummer']);
     $uren = array(
         'maandag' => sanitize_text_field($_POST['uren_maandag']),
@@ -103,66 +105,40 @@ function urenregistratie_verwerk_inzending($user_id, $user_email)
         'zondag' => sanitize_text_field($_POST['uren_zondag']),
     );
 
-    $existing_posts = get_posts(array(
-        'post_type' => 'uren',
-        'meta_query' => array(
-            array(
-                'key' => 'user_id',
-                'value' => $user_id,
-                'compare' => '='
-            ),
-            array(
-                'key' => 'weeknummer',
-                'value' => $weeknummer,
-                'compare' => '='
-            )
-        )
+    $existing_entry = $wpdb->get_var($wpdb->prepare(
+        "SELECT COUNT(*) FROM $table_name WHERE user_id = %d AND weeknummer = %d",
+        $user_id,
+        $weeknummer
     ));
 
-    if (!empty($existing_posts)) {
+    if ($existing_entry > 0) {
         return 'Je hebt al uren ingediend voor week ' . esc_html($weeknummer) . '.';
     }
 
-    $uren_post = array(
-        'post_title' => 'Uren Week ' . $weeknummer . ' - Gebruiker ' . $user_id,
-        'post_content' => json_encode($uren),
-        'post_status' => 'publish',
-        'post_type' => 'uren',
-        'meta_input' => array(
+    $wpdb->insert(
+        $table_name,
+        array(
             'user_id' => $user_id,
             'weeknummer' => $weeknummer,
-            'uren' => $uren,
-            'status' => 'in afwachting',
-            'kandidaat_email' => $user_email,
-        ),
+            'uren' => json_encode($uren),
+            'status' => 'in afwachting'
+        )
     );
 
-    wp_insert_post($uren_post);
-    header('Location: /');
+    wp_redirect(home_url());
+    exit;
 }
 
-function urenregistratie_get_ingediende_weken($user_id)
+function get_submitted_weeks($user_id)
 {
-    $posts = get_posts(array(
-        'post_type' => 'uren',
-        'meta_query' => array(
-            array(
-                'key' => 'user_id',
-                'value' => $user_id,
-                'compare' => '='
-            )
-        ),
-        'posts_per_page' => -1
-    ));
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'uren';
 
-    $weken = array();
-    foreach ($posts as $post) {
-        $weeknummer = get_post_meta($post->ID, 'weeknummer', true);
-        $status = get_post_meta($post->ID, 'status', true) ?: 'in afwachting';
-        if ($weeknummer && !in_array($weeknummer, array_column($weken, 'weeknummer'))) {
-            $weken[] = array('weeknummer' => $weeknummer, 'status' => $status);
-        }
-    }
+    $results = $wpdb->get_results($wpdb->prepare(
+        "SELECT weeknummer, status FROM $table_name WHERE user_id = %d",
+        $user_id
+    ), ARRAY_A);
 
-    return $weken;
+    return $results;
 }
+?>
