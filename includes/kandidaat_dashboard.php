@@ -166,4 +166,3 @@ function urenregistratie_get_ingediende_weken($user_id)
 
     return $weken;
 }
-?>
