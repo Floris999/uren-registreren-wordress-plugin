@@ -7,7 +7,8 @@ function urenregistratie_admin_menu()
         'Uren Overzicht',
         'manage_options',
         'uren-overzicht',
-        'urenregistratie_admin_page'
+        'urenregistratie_admin_page',
+        'dashicons-clock',
     );
 }
 add_action('admin_menu', 'urenregistratie_admin_menu');
