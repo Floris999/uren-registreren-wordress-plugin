@@ -57,7 +57,7 @@ function hide_default_login_form()
 {
 ?>
     <style>
-        /* Verberg het standaard WordPress-inlogformulier en de taalkeuze */
+        /* Hide default WordPress-loginform (nasty fix) */
         #login,
         #language-switcher {
             display: none;
