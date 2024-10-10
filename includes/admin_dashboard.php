@@ -13,14 +13,16 @@ function hours_registration_admin_menu()
 }
 add_action('admin_menu', 'hours_registration_admin_menu');
 
-function get_start_and_end_date($week, $year)
-{
-    $dto = new DateTime();
-    $dto->setISODate($year, $week);
-    $start_date = $dto->format('Y-m-d');
-    $dto->modify('+6 days');
-    $end_date = $dto->format('Y-m-d');
-    return array($start_date, $end_date);
+if (!function_exists('get_start_and_end_date')) {
+    function get_start_and_end_date($week, $year)
+    {
+        $dto = new DateTime();
+        $dto->setISODate($year, $week);
+        $start_date = $dto->format('d-m-Y');
+        $dto->modify('+6 days');
+        $end_date = $dto->format('d-m-Y');
+        return array($start_date, $end_date);
+    }
 }
 
 function hours_registration_admin_page()
@@ -118,13 +120,12 @@ function hours_registration_admin_page()
                         $totaal_uren += (int)$uren_per_dag;
                     }
 
-                    // Bereken de begin- en einddatum van de week
                     list($start_date, $end_date) = get_start_and_end_date($weeknummer, date('Y'));
 
                     echo '<tr>';
                     echo '<td>' . esc_html($naam) . '</td>';
                     echo '<td>' . esc_html($weeknummer) . '</td>';
-                    echo '<td>' . esc_html($start_date) . ' - ' . esc_html($end_date) . '</td>';
+                    echo '<td>' . esc_html($start_date) . ' <br> ' . esc_html($end_date) . '</td>';
                     echo '<td>' . $ingediende_uren . '</td>';
                     echo '<td>' . esc_html($totaal_uren) . '</td>';
                     echo '<td>' . esc_html($status) . '</td>';

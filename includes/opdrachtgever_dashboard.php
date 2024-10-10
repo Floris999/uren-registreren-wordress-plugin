@@ -5,9 +5,9 @@ if (!function_exists('get_start_and_end_date')) {
     {
         $dto = new DateTime();
         $dto->setISODate($year, $week);
-        $start_date = $dto->format('Y-m-d');
+        $start_date = $dto->format('d-m-Y');
         $dto->modify('+6 days');
-        $end_date = $dto->format('Y-m-d');
+        $end_date = $dto->format('d-m-Y');
         return array($start_date, $end_date);
     }
 }
@@ -105,15 +105,20 @@ function hours_registration_client_dashboard()
                             list($start_date, $end_date) = get_start_and_end_date($weeknummer, date('Y'));
             ?>
                             <tr>
-                                <td class="text-sm"><?php echo esc_html($naam); ?></td>
-                                <td class="text-center text-sm"><?php echo esc_html($weeknummer); ?></td>
-                                <td class="text-sm"><?php echo esc_html($start_date) . ' - ' . esc_html($end_date); ?></td>
-                                <td class="text-sm"><?php echo $ingediende_uren; ?></td>
-                                <td class="text-center text-sm"><?php echo esc_html($totaal_uren); ?></td>
-                                <td class="text-center text-sm"><?php echo esc_html($status); ?></td>
-                                <td class="text-center text-sm"><?php echo esc_html($datum_aangevraagd); ?></td>
-                                <td class="text-center text-sm">
-                                    <div class="flex space-x-2">
+                                <td class="px-4 py-2 text-center text-sm whitespace-nowrap"><?php echo esc_html($naam); ?></td>
+                                <td class="px-4 py-2 text-center text-sm whitespace-nowrap"><?php echo esc_html($weeknummer); ?></td>
+                                <td class="px-4 py-2 text-center text-sm whitespace-nowrap">
+                                    <?php echo esc_html($start_date); ?><br>
+                                    <?php echo esc_html($end_date); ?>
+                                </td>
+                                <td class="px-4 py-2 text-center text-sm whitespace-nowrap">
+                                    <?php echo $ingediende_uren; ?>
+                                </td>
+                                <td class="px-4 py-2 text-center text-sm whitespace-nowrap"><?php echo esc_html($totaal_uren); ?></td>
+                                <td class="px-4 py-2 text-center text-sm whitespace-nowrap"><?php echo esc_html($status); ?></td>
+                                <td class="px-4 py-2 text-center text-sm whitespace-nowrap"><?php echo esc_html($datum_aangevraagd); ?></td>
+                                <td class="px-4 py-2 text-center text-sm whitespace-nowrap">
+                                    <div class="flex space-x-2 justify-center">
                                         <form method="post" style="display:inline;">
                                             <input type="hidden" name="entry_id" value="<?php echo esc_attr($entry_id); ?>">
                                             <input type="hidden" name="status" value="goedgekeurd">

@@ -1,25 +1,34 @@
 <?php
 
-function notificatie_verzend_email($action, $to, $message)
+function send_candidate_notification_email($record_id)
 {
-    $onderwerp = "Notificatie: " . $action;
-    $headers = array('Content-Type: text/html; charset=UTF-8');
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'uren';
 
-    wp_mail($to, $onderwerp, nl2br($message), $headers);
-}
+    $uren_data = $wpdb->get_row($wpdb->prepare(
+        "SELECT * FROM $table_name WHERE id = %d",
+        $record_id
+    ));
 
-add_action('publish_uren', function ($post_id) {
-    $kandidaat_email = get_post_meta($post_id, 'kandidaat_email', true);
-    $user_id = get_post_field('post_author', $post_id);
-    $user_info = get_userdata($user_id);
+    if (!$uren_data) {
+        return;
+    }
+
+    $user_info = get_userdata($uren_data->user_id);
     $user_name = $user_info ? $user_info->display_name : 'Kandidaat';
-    $login_url = wp_login_url();
+    $user_email = $user_info ? $user_info->user_email : '';
 
+    if (empty($user_email)) {
+        return;
+    }
+
+
+    $login_url = wp_login_url();
     $message = 'Beste ' . $user_name . ',<br><br>';
-    $message .= 'Je hebt nieuwe uren ingediend.<br><br>';
+    $message .= 'Je hebt nieuwe uren ingediend voor week ' . $uren_data->weeknummer . '.<br><br>';
     $message .= 'Log in om de status van je uren te bekijken: <a href="' . $login_url . '">' . $login_url . '</a>';
 
-    notificatie_verzend_email('Nieuwe uren ingediend', $kandidaat_email, $message);
-});
+    $headers = array('Content-Type: text/html; charset=UTF-8');
 
-add_action('admin_post_reject_uren', 'urenregistratie_reject_uren');
+    wp_mail($user_email, 'Nieuwe uren ingediend', $message, $headers);
+}
