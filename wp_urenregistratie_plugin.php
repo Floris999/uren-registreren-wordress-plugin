@@ -3,7 +3,8 @@
 Plugin Name: Urenregistratie Plugin
 Description: Een plugin voor het verzenden van uren naar opdrachtgever(s), inclusief een opdrachtgever en beheerder dashboard.
 Version: 1.0
-Author: Dintech
+Author: Dintify
+Author URI: https://floris999.github.io
 */
 
 if (!defined('ABSPATH')) exit;
