@@ -62,7 +62,7 @@ function hours_registration_user_form()
                     </div>
                 <?php endif; ?>
                 <form method="post" action="" class="mt-4">
-                    <input type="hidden" name="weeknummer" value="<?php echo esc_attr($weeknummer); ?>">
+                    <input type="hidden" name="old_weeknummer" value="<?php echo esc_attr($weeknummer); ?>">
                     <input type="hidden" name="kandidaat_id" value="<?php echo esc_attr($kandidaat_id); ?>">
                     <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
                         <dt class="text-sm font-medium leading-6 text-gray-900">
@@ -156,6 +156,7 @@ function process_opdrachtgever_submission($kandidaat_id, $user_email)
     $table_name = $wpdb->prefix . 'uren';
 
     $weeknummer = sanitize_text_field($_POST['weeknummer']);
+    $old_weeknummer = sanitize_text_field($_POST['old_weeknummer']);
     $uren = array(
         'maandag' => sanitize_text_field($_POST['uren_maandag']),
         'dinsdag' => sanitize_text_field($_POST['uren_dinsdag']),
@@ -169,12 +170,13 @@ function process_opdrachtgever_submission($kandidaat_id, $user_email)
     $wpdb->update(
         $table_name,
         array(
+            'weeknummer' => $weeknummer,
             'uren' => json_encode($uren),
             'status' => 'goedgekeurd'
         ),
         array(
             'user_id' => $kandidaat_id,
-            'weeknummer' => $weeknummer
+            'weeknummer' => $old_weeknummer
         )
     );
 
