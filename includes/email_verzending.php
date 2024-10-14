@@ -1,5 +1,14 @@
 <?php
 
+function get_start_and_end_date($week, $year) {
+    $dto = new DateTime();
+    $dto->setISODate($year, $week);
+    $start_date = $dto->format('d-m-Y');
+    $dto->modify('+6 days');
+    $end_date = $dto->format('d-m-Y');
+    return array($start_date, $end_date);
+}
+
 function send_hours_submission_email_custom_table($record_id)
 {
     global $wpdb;
@@ -40,10 +49,14 @@ function send_hours_submission_email_custom_table($record_id)
             $totaal_uren += (int)$uren_per_dag;
         }
     }
+
+    // Bereken de start- en einddatum van de week
+    list($start_date, $end_date) = get_start_and_end_date($uren_data->weeknummer, date('Y'));
+
     $subject = 'Nieuwe uren ingediend door ' . $user_name;
 
     $message = 'Beste ' . $opdrachtgever_info->display_name . ",\n\n";
-    $message .= 'Er zijn nieuwe uren ingediend door ' . $user_name . " voor week " . $uren_data->weeknummer . ":\n\n";
+    $message .= 'Er zijn nieuwe uren ingediend door ' . $user_name . " voor week " . $uren_data->weeknummer . " (van " . $start_date . " tot " . $end_date . "):\n\n";
     $message .= $uren_leesbaar;
     $message .= "\n\nTotaal aantal uren: " . $totaal_uren . " uur";
     $message .= "\n\nBekijk de ingediende uren in het dashboard: " . site_url('/wp-admin') . "\n\n";

@@ -55,7 +55,8 @@ function hours_registration_user_form()
                             <label for="weeknummer">Weeknummer:</label>
                         </dt>
                         <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                            <input type="number" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="weeknummer" name="weeknummer" required>
+                            <input type="number" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="weeknummer" name="weeknummer" required min="1" max="53" oninput="updateWeekDates()">
+                            <div id="week-dates" class="mt-2 text-sm text-gray-700"></div>
                         </dd>
                     </div>
 

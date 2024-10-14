@@ -36,4 +36,11 @@ function urenregistratie_enqueue_tailwind()
     wp_enqueue_style('tailwind-css', 'https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css');
 }
 
+function enqueue_custom_scripts()
+{
+    wp_enqueue_script('custom-script', plugin_dir_url(__FILE__) . 'assets/script.js', array(), null, true);
+}
+
+add_action('wp_enqueue_scripts', 'enqueue_custom_scripts');
+
 add_action('wp_enqueue_scripts', 'urenregistratie_enqueue_tailwind');
