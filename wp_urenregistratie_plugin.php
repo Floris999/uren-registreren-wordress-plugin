@@ -14,7 +14,6 @@ require_once plugin_dir_path(__FILE__) . 'includes/admin_dashboard.php';
 require_once plugin_dir_path(__FILE__) . 'includes/kandidaat_dashboard.php';
 require_once plugin_dir_path(__FILE__) . 'includes/notificaties.php';
 require_once plugin_dir_path(__FILE__) . 'includes/opdrachtgever_dashboard.php';
-require_once plugin_dir_path(__FILE__) . 'includes/wordpress_login_screen.php';
 include_once plugin_dir_path(__FILE__) . 'redirects.php';
 require_once plugin_dir_path(__FILE__) . 'custom_table.php';
 
