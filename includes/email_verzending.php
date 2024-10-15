@@ -1,6 +1,7 @@
 <?php
 
-function get_start_and_end_date($week, $year) {
+function get_start_and_end_date($week, $year)
+{
     $dto = new DateTime();
     $dto->setISODate($year, $week);
     $start_date = $dto->format('d-m-Y');
@@ -61,7 +62,7 @@ function send_hours_submission_email_custom_table($record_id)
     $message .= "\n\nTotaal aantal uren: " . $totaal_uren . " uur";
     $message .= "\n\nBekijk de ingediende uren in het dashboard: " . site_url('/wp-admin') . "\n\n";
     $message .= "Met vriendelijke groet,\n";
-    $message .= 'Het Uren Registratie Team';
+    $message .= get_bloginfo('name');
 
     wp_mail($opdrachtgever_info->user_email, $subject, nl2br($message), array('Content-Type: text/html; charset=UTF-8'));
     wp_mail($admin_email, $subject, nl2br($message), array('Content-Type: text/html; charset=UTF-8'));
