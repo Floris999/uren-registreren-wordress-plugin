@@ -7,15 +7,22 @@ function hours_registration_user_form()
     }
 
     $current_user = wp_get_current_user();
-    $user_name = $current_user->display_name;
-    $user_email = $current_user->user_email;
-
     $is_edit_mode = isset($_GET['edit']) && $_GET['edit'] === 'true';
     $weeknummer = isset($_GET['weeknummer']) ? intval($_GET['weeknummer']) : 0;
     $kandidaat_id = isset($_GET['kandidaat_id']) ? intval($_GET['kandidaat_id']) : $current_user->ID;
 
     if (!in_array('kandidaat', $current_user->roles) && !in_array('administrator', $current_user->roles) && !in_array('opdrachtgever', $current_user->roles)) {
         return '<p>Je hebt geen toestemming om deze pagina te bekijken.</p>';
+    }
+
+
+    if ($is_edit_mode && $kandidaat_id) {
+        $kandidaat_user = get_userdata($kandidaat_id);
+        $user_name = $kandidaat_user->display_name;
+        $user_email = $kandidaat_user->user_email;
+    } else {
+        $user_name = $current_user->display_name;
+        $user_email = $current_user->user_email;
     }
 
     $error_message = isset($_GET['error_message']) ? urldecode($_GET['error_message']) : '';
@@ -56,7 +63,7 @@ function hours_registration_user_form()
                         <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
                             <ul class="list-disc list-inside">
                                 <?php foreach ($ingediende_weken as $week): ?>
-                                    <li>Week <?php echo esc_html($week['weeknummer']); ?>: <?php echo esc_html($week['status']); ?> (uren aangevraagd: <?php echo esc_html($week['totaal_uren']); ?>)</li>
+                                    <li>Week <?php echo esc_html($week['weeknummer']); ?>: <?php echo esc_html($week['status']); ?> (Totaal uren: <?php echo esc_html($week['totaal_uren']); ?>)</li>
                                 <?php endforeach; ?>
                             </ul>
                         </dd>
