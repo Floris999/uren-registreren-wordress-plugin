@@ -61,7 +61,21 @@ function hours_registration_admin_page()
         delete_user_meta($kandidaat_id, 'opdrachtgever_id');
     }
 
-    $results = $wpdb->get_results("SELECT * FROM $table_name", ARRAY_A);
+    $order_by = isset($_GET['order_by']) ? sanitize_text_field($_GET['order_by']) : 'weeknummer';
+    $order = isset($_GET['order']) ? sanitize_text_field($_GET['order']) : 'ASC';
+
+    $valid_order_by = array('weeknummer');
+    $valid_order = array('ASC', 'DESC');
+    if (!in_array($order_by, $valid_order_by)) {
+        $order_by = 'weeknummer';
+    }
+    if (!in_array($order, $valid_order)) {
+        $order = 'ASC';
+    }
+
+    $next_order = ($order === 'ASC') ? 'DESC' : 'ASC';
+
+    $results = $wpdb->get_results("SELECT * FROM $table_name ORDER BY $order_by $order", ARRAY_A);
 
     echo '<div class="wrap">';
     echo '<h1>Urenoverzicht</h1>';
@@ -71,7 +85,7 @@ function hours_registration_admin_page()
         echo '<thead>
         <tr>
             <th>Naam</th>
-            <th>Weeknummer</th>
+            <th><a href="' . esc_url(add_query_arg(array('order_by' => 'weeknummer', 'order' => $next_order))) . '" style="text-decoration: none; color: inherit;">Weeknummer ' . ($order_by === 'weeknummer' ? ($order === 'ASC' ? '▲' : '▼') : '') . '</a></th>
             <th>Weekdatum</th>
             <th>Ingediende uren</th>
             <th>Totaal uren</th>
