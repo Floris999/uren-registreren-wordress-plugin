@@ -18,11 +18,12 @@ function hours_registration_user_form()
         return '<p>Je hebt geen toestemming om deze pagina te bekijken.</p>';
     }
 
+    $error_message = isset($_GET['error_message']) ? urldecode($_GET['error_message']) : '';
     if (isset($_POST['uren_submit'])) {
         if ($is_edit_mode) {
-            process_opdrachtgever_submission($kandidaat_id, $user_email);
+            $error_message = process_opdrachtgever_submission($kandidaat_id, $user_email);
         } else {
-            process_hours_submission($current_user->ID, $user_email);
+            $error_message = process_hours_submission($current_user->ID, $user_email);
         }
     }
 
@@ -55,7 +56,7 @@ function hours_registration_user_form()
                         <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
                             <ul class="list-disc list-inside">
                                 <?php foreach ($ingediende_weken as $week): ?>
-                                    <li>Week <?php echo esc_html($week['weeknummer']); ?>: <?php echo esc_html($week['status']); ?></li>
+                                    <li>Week <?php echo esc_html($week['weeknummer']); ?>: <?php echo esc_html($week['status']); ?> (uren aangevraagd: <?php echo esc_html($week['totaal_uren']); ?>)</li>
                                 <?php endforeach; ?>
                             </ul>
                         </dd>
@@ -71,6 +72,9 @@ function hours_registration_user_form()
                         <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
                             <input type="number" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="weeknummer" name="weeknummer" required min="1" max="53" oninput="updateWeekDates()" value="<?php echo esc_attr($is_edit_mode ? $weeknummer : ''); ?>">
                             <div id="week-dates" class="mt-2 text-sm text-gray-700"></div>
+                            <?php if (!empty($error_message)): ?>
+                                <p class="text-red-500 text-xs italic"><?php echo esc_html($error_message); ?></p>
+                            <?php endif; ?>
                         </dd>
                     </div>
 
@@ -90,7 +94,7 @@ function hours_registration_user_form()
                     <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
                         <dt class="text-sm font-medium leading-6 text-gray-900"></dt>
                         <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                            <button type="submit" name="uren_submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"><?php echo $is_edit_mode ? 'Uren aanpassen' : 'Uren registreren'; ?></button>
+                            <button type="submit" name="uren_submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" <?php echo !empty($error_message) ? 'disabled' : ''; ?>><?php echo $is_edit_mode ? 'Uren aanpassen' : 'Uren registreren'; ?></button>
                         </dd>
                     </div>
                 </form>
@@ -127,7 +131,8 @@ function process_hours_submission($user_id, $user_email)
     ));
 
     if ($existing_entry > 0) {
-        return 'Je hebt al uren ingediend voor week ' . esc_html($weeknummer) . '.';
+        wp_redirect(add_query_arg('error_message', urlencode('Je hebt al uren ingediend voor week ' . esc_html($weeknummer) . '.'), home_url('/kandidaat')));
+        exit;
     }
 
     $wpdb->insert(
@@ -190,9 +195,15 @@ function get_submitted_weeks($user_id)
     $table_name = $wpdb->prefix . 'uren';
 
     $results = $wpdb->get_results($wpdb->prepare(
-        "SELECT weeknummer, status FROM $table_name WHERE user_id = %d",
+        "SELECT weeknummer, status, uren FROM $table_name WHERE user_id = %d",
         $user_id
     ), ARRAY_A);
+
+    foreach ($results as &$result) {
+        $uren = json_decode($result['uren'], true);
+        $totaal_uren = array_sum($uren);
+        $result['totaal_uren'] = $totaal_uren;
+    }
 
     return $results;
 }
