@@ -24,6 +24,14 @@ function hours_registration_client_dashboard()
         return '<p>Je hebt geen toestemming om deze pagina te bekijken.</p>';
     }
 
+    if (!session_id()) {
+        session_start();
+    }
+
+    if (!isset($_GET['token']) || !isset($_SESSION['opdrachtgever_token']) || $_GET['token'] !== $_SESSION['opdrachtgever_token']) {
+        return '<p>Oeps! Kies een gekoppelde kandidaat, om deze pagina te kunnen zien.</p>';
+    }
+
     global $wpdb;
     $table_name = $wpdb->prefix . 'uren';
 

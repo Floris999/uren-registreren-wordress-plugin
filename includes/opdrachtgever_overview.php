@@ -27,6 +27,11 @@ function hours_registration_client_overview()
         return '<p>Er zijn nog geen kandidaten toegevoegd.</p>';
     }
 
+    if (!session_id()) {
+        session_start();
+    }
+    $_SESSION['opdrachtgever_token'] = bin2hex(random_bytes(32));
+
     ob_start();
 ?>
     <div class="flex flex-col mb-1 sm:mb-0">
@@ -48,7 +53,7 @@ function hours_registration_client_overview()
                         <td class="px-2 py-4 text-left text-sm whitespace-nowrap"><?php echo esc_html($user->display_name); ?></td>
                         <td class="px-2 py-4 text-left text-sm whitespace-nowrap"><?php echo esc_html($user->user_email); ?></td>
                         <td class="px-2 py-4 text-left text-sm whitespace-nowrap">
-                            <a href="<?php echo esc_url(add_query_arg(array('kandidaat_id' => $user->ID), home_url('/opdrachtgever-dashboard'))); ?>" class="bg-black hover:bg-gray-800 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Bekijk uren</a>
+                            <a href="<?php echo esc_url(add_query_arg(array('kandidaat_id' => $user->ID, 'token' => $_SESSION['opdrachtgever_token']), home_url('/opdrachtgever-dashboard'))); ?>" class="bg-black hover:bg-gray-800 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Bekijk uren</a>
                         </td>
                     </tr>
                 <?php endforeach; ?>
