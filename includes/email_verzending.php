@@ -34,11 +34,12 @@ function send_hours_submission_email_custom_table($record_id)
         return;
     }
 
-    // Haal het admin emailadres op
     $admin_email = get_option('urenregistratie_notification_email', '');
     if (!$admin_email) {
         return;
     }
+
+    $extra_notification_email = get_user_meta($uren_data->user_id, 'notificatie_mail_2', true);
 
     $uren = json_decode($uren_data->uren, true);
 
@@ -51,7 +52,6 @@ function send_hours_submission_email_custom_table($record_id)
         }
     }
 
-    // Bereken de start- en einddatum van de week
     list($start_date, $end_date) = get_start_and_end_date($uren_data->weeknummer, date('Y'));
 
     $subject = 'Nieuwe uren ingediend door ' . $user_name;
@@ -66,4 +66,8 @@ function send_hours_submission_email_custom_table($record_id)
 
     wp_mail($opdrachtgever_info->user_email, $subject, nl2br($message), array('Content-Type: text/html; charset=UTF-8'));
     wp_mail($admin_email, $subject, nl2br($message), array('Content-Type: text/html; charset=UTF-8'));
+
+    if (!empty($extra_notification_email)) {
+        wp_mail($extra_notification_email, $subject, nl2br($message), array('Content-Type: text/html; charset=UTF-8'));
+    }
 }
