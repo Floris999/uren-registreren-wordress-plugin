@@ -56,8 +56,25 @@ function hours_registration_client_dashboard()
         return '<p>Er zijn nog geen kandidaten toegevoegd.</p>';
     }
 
+    // Haal de sorteerparameters op uit de URL
+    $order_by = isset($_GET['order_by']) ? sanitize_text_field($_GET['order_by']) : 'weeknummer';
+    $order = isset($_GET['order']) ? sanitize_text_field($_GET['order']) : 'ASC';
+
+    // Valideer de sorteerparameters
+    $valid_order_by = array('weeknummer', 'naam');
+    $valid_order = array('ASC', 'DESC');
+    if (!in_array($order_by, $valid_order_by)) {
+        $order_by = 'weeknummer';
+    }
+    if (!in_array($order, $valid_order)) {
+        $order = 'ASC';
+    }
+
+    // Wissel de sorteerorde om voor de volgende klik
+    $next_order = ($order === 'ASC') ? 'DESC' : 'ASC';
+
     $results = $wpdb->get_results(
-        "SELECT * FROM $table_name WHERE user_id IN (" . implode(',', array_map('intval', $kandidaat_user_ids)) . ")",
+        "SELECT * FROM $table_name WHERE user_id IN (" . implode(',', array_map('intval', $kandidaat_user_ids)) . ") ORDER BY $order_by $order",
         ARRAY_A
     );
 
@@ -71,8 +88,19 @@ function hours_registration_client_dashboard()
         <table class="min-w-full table-auto">
             <thead>
                 <tr>
-                    <th class="px-6 py-4 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase">Naam</th>
-                    <th class="px-6 py-4 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase">Weeknummer</th>
+                    <th class="px-6 py-4 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase">
+                        <a href="<?php echo esc_url(add_query_arg(array('order_by' => 'naam', 'order' => $next_order))); ?>">
+                            Naam <?php if ($order_by === 'naam') echo $order === 'ASC' ? '▲' : '▼'; ?>
+                        </a>
+                    </th>
+                    <th class="px-6 py-4 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase">
+                        <a href="<?php echo esc_url(add_query_arg(array('order_by' => 'weeknummer', 'order' => $next_order))); ?>" class="inline-flex items-center">
+                            <span>Weeknummer</span>
+                            <span class="ml-1">
+                                <?php if ($order_by === 'weeknummer') echo $order === 'ASC' ? '▲' : '▼'; ?>
+                            </span>
+                        </a>
+                    </th>
                     <th class="px-6 py-4 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase">Weekdatum</th>
                     <th class="px-6 py-4 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase">Ingediende uren</th>
                     <th class="px-6 py-4 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase">Totaal uren</th>
