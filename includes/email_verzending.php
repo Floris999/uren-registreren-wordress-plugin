@@ -39,7 +39,8 @@ function send_hours_submission_email_custom_table($record_id)
         return;
     }
 
-    $extra_notification_email = get_user_meta($uren_data->user_id, 'notificatie_mail_2', true);
+    $extra_notification_email = get_user_meta($opdrachtgever_id, 'notificatie_mail_2', true);
+
 
     $uren = json_decode($uren_data->uren, true);
 
