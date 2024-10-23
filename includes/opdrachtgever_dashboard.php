@@ -56,11 +56,9 @@ function hours_registration_client_dashboard()
         return '<p>Er zijn nog geen kandidaten toegevoegd.</p>';
     }
 
-    // Haal de sorteerparameters op uit de URL
     $order_by = isset($_GET['order_by']) ? sanitize_text_field($_GET['order_by']) : 'weeknummer';
     $order = isset($_GET['order']) ? sanitize_text_field($_GET['order']) : 'ASC';
 
-    // Valideer de sorteerparameters
     $valid_order_by = array('weeknummer', 'naam');
     $valid_order = array('ASC', 'DESC');
     if (!in_array($order_by, $valid_order_by)) {
@@ -70,7 +68,6 @@ function hours_registration_client_dashboard()
         $order = 'ASC';
     }
 
-    // Wissel de sorteerorde om voor de volgende klik
     $next_order = ($order === 'ASC') ? 'DESC' : 'ASC';
 
     $results = $wpdb->get_results(
