@@ -101,7 +101,7 @@ function hours_registration_user_form()
                     <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
                         <dt class="text-sm font-medium leading-6 text-gray-900"></dt>
                         <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                            <button type="submit" name="uren_submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" <?php echo !empty($error_message) ? 'disabled' : ''; ?>><?php echo $is_edit_mode ? 'Uren aanpassen' : 'Uren registreren'; ?></button>
+                            <button type="submit" name="uren_submit" class="bg-black hover:bg-gray-800 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" <?php echo !empty($error_message) ? 'disabled' : ''; ?>><?php echo $is_edit_mode ? 'Uren aanpassen' : 'Uren registreren'; ?></button>
                         </dd>
                     </div>
                 </form>

@@ -40,16 +40,33 @@ function hours_registration_client_dashboard()
         exit;
     }
 
-    $kandidaat_users = get_users(array(
-        'role' => 'kandidaat',
-        'meta_query' => array(
-            array(
-                'key' => 'opdrachtgever_id',
-                'value' => $current_user->ID,
-                'compare' => '='
+    $kandidaat_id = isset($_GET['kandidaat_id']) ? intval($_GET['kandidaat_id']) : 0;
+
+    if ($kandidaat_id) {
+        $kandidaat_users = get_users(array(
+            'role' => 'kandidaat',
+            'include' => array($kandidaat_id),
+            'meta_query' => array(
+                array(
+                    'key' => 'opdrachtgever_id',
+                    'value' => $current_user->ID,
+                    'compare' => '='
+                )
             )
-        )
-    ));
+        ));
+    } else {
+        $kandidaat_users = get_users(array(
+            'role' => 'kandidaat',
+            'meta_query' => array(
+                array(
+                    'key' => 'opdrachtgever_id',
+                    'value' => $current_user->ID,
+                    'compare' => '='
+                )
+            )
+        ));
+    }
+
     $kandidaat_user_ids = wp_list_pluck($kandidaat_users, 'ID');
 
     if (empty($kandidaat_user_ids)) {
