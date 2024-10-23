@@ -15,7 +15,6 @@ function hours_registration_user_form()
         return '<p>Je hebt geen toestemming om deze pagina te bekijken.</p>';
     }
 
-
     if ($is_edit_mode && $kandidaat_id) {
         $kandidaat_user = get_userdata($kandidaat_id);
         $user_name = $kandidaat_user->display_name;
@@ -35,7 +34,7 @@ function hours_registration_user_form()
     }
 
     if ($is_edit_mode && $weeknummer && $kandidaat_id) {
-        $ingediende_uren = get_ingediende_uren($kandidaat_id, $weeknummer);
+        $ingediende_uren = get_submitted_hours($kandidaat_id, $weeknummer);
     }
 
     $ingediende_weken = get_submitted_weeks($current_user->ID);
@@ -101,7 +100,7 @@ function hours_registration_user_form()
                     <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
                         <dt class="text-sm font-medium leading-6 text-gray-900"></dt>
                         <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                            <button type="submit" name="uren_submit" class="bg-black hover:bg-gray-800 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" <?php echo !empty($error_message) ? 'disabled' : ''; ?>><?php echo $is_edit_mode ? 'Uren aanpassen' : 'Uren registreren'; ?></button>
+                            <button type="submit" name="uren_submit" class="bg-black hover:bg-gray-800 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"><?php echo $is_edit_mode ? 'Uren aanpassen' : 'Uren registreren'; ?></button>
                         </dd>
                     </div>
                 </form>
@@ -215,7 +214,7 @@ function get_submitted_weeks($user_id)
     return $results;
 }
 
-function get_ingediende_uren($kandidaat_id, $weeknummer)
+function get_submitted_hours($kandidaat_id, $weeknummer)
 {
     global $wpdb;
     $table_name = $wpdb->prefix . 'uren';
