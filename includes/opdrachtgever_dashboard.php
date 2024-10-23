@@ -120,11 +120,13 @@ function hours_registration_client_dashboard()
                                     <td class="px-2 py-4 text-center text-sm whitespace-nowrap"><?php echo esc_html($datum_aangevraagd); ?></td>
                                     <td class="px-2 py-4 text-center text-sm whitespace-nowrap">
                                         <div class="flex space-x-2 justify-center">
-                                            <form method="post" style="display:inline;">
-                                                <input type="hidden" name="entry_id" value="<?php echo esc_attr($entry_id); ?>">
-                                                <input type="hidden" name="status" value="goedgekeurd">
-                                                <button type="submit" name="update_status" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Goedkeuren</button>
-                                            </form>
+                                            <?php if ($status !== 'goedgekeurd'): ?>
+                                                <form method="post" style="display:inline;">
+                                                    <input type="hidden" name="entry_id" value="<?php echo esc_attr($entry_id); ?>">
+                                                    <input type="hidden" name="status" value="goedgekeurd">
+                                                    <button type="submit" name="update_status" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Goedkeuren</button>
+                                                </form>
+                                            <?php endif; ?>
                                             <a href="<?php echo esc_url(add_query_arg(array('weeknummer' => $weeknummer, 'kandidaat_id' => $user_id, 'edit' => 'true'), home_url('/kandidaat'))); ?>" class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Aanpassen</a>
                                         </div>
                                     </td>
