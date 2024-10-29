@@ -181,7 +181,7 @@ function process_hours_submission($user_id, $user_email)
 
     send_candidate_notification_email($record_id);
 
-    wp_redirect(home_url());
+    wp_redirect(home_url('/kandidaat'));
     exit;
 }
 
