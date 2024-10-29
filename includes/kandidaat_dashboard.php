@@ -69,7 +69,7 @@ function hours_registration_user_form()
                     <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
                         <dt class="text-sm font-medium leading-6 text-gray-900">Ingediende weken</dt>
                         <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                            <ul class="list-disc list-inside">
+                            <ul class="list-inside list-none">
                                 <?php foreach ($ingediende_weken as $week): ?>
                                     <li>Week <?php echo esc_html($week['weeknummer']); ?>: <?php echo esc_html($week['status']); ?> (Totaal uren: <?php echo esc_html($week['totaal_uren']); ?>)</li>
                                 <?php endforeach; ?>
