@@ -1,5 +1,4 @@
 <?php
-
 function hours_registration_user_form()
 {
     if (!is_user_logged_in()) {
@@ -19,9 +18,11 @@ function hours_registration_user_form()
         $kandidaat_user = get_userdata($kandidaat_id);
         $user_name = $kandidaat_user->display_name;
         $user_email = $kandidaat_user->user_email;
+        $opdrachtgever_naam = get_client_name($kandidaat_id);
     } else {
         $user_name = $current_user->display_name;
         $user_email = $current_user->user_email;
+        $opdrachtgever_naam = get_client_name($current_user->ID);
     }
 
     $error_message = isset($_GET['error_message']) ? urldecode($_GET['error_message']) : '';
@@ -39,6 +40,10 @@ function hours_registration_user_form()
 
     $ingediende_weken = get_submitted_weeks($current_user->ID);
 
+    usort($ingediende_weken, function ($a, $b) {
+        return $b['weeknummer'] - $a['weeknummer'];
+    });
+
     ob_start();
 ?>
     <div>
@@ -55,6 +60,10 @@ function hours_registration_user_form()
                 <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
                     <dt class="text-sm font-medium leading-6 text-gray-900">E-mailadres</dt>
                     <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0"><?php echo esc_html($user_email); ?></dd>
+                </div>
+                <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                    <dt class="text-sm font-medium leading-6 text-gray-900">Opdrachtgevernaam</dt>
+                    <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0"><?php echo esc_html($opdrachtgever_naam); ?></dd>
                 </div>
                 <?php if (!empty($ingediende_weken)): ?>
                     <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
@@ -113,6 +122,18 @@ function hours_registration_user_form()
 }
 
 add_shortcode('urenregistratie_form', 'hours_registration_user_form');
+
+function get_client_name($kandidaat_id)
+{
+    $opdrachtgever_id = get_user_meta($kandidaat_id, 'opdrachtgever_id', true);
+    if ($opdrachtgever_id) {
+        $opdrachtgever_info = get_userdata($opdrachtgever_id);
+        if ($opdrachtgever_info) {
+            return $opdrachtgever_info->display_name;
+        }
+    }
+    return 'Geen opdrachtgever gevonden';
+}
 
 function process_hours_submission($user_id, $user_email)
 {
