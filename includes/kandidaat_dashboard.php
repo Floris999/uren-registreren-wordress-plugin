@@ -1,4 +1,12 @@
 <?php
+
+function enqueue_weekpicker_assets() {
+    wp_enqueue_style('jquery-ui-css', 'https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css');
+    wp_enqueue_script('jquery-ui-datepicker');
+    wp_enqueue_script('weekpicker-js', plugin_dir_url(__FILE__) . '../assets/weekpicker.js', array('jquery', 'jquery-ui-datepicker'), null, true);
+}
+add_action('wp_enqueue_scripts', 'enqueue_weekpicker_assets');
+
 function hours_registration_user_form()
 {
     if (!is_user_logged_in()) {
