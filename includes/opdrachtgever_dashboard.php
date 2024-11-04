@@ -176,8 +176,8 @@ function hours_registration_client_dashboard()
                                                     <input type="hidden" name="status" value="goedgekeurd">
                                                     <button type="submit" name="update_status" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Goedkeuren</button>
                                                 </form>
+                                                <a href="<?php echo esc_url(add_query_arg(array('weeknummer' => $weeknummer, 'kandidaat_id' => $user_id, 'edit' => 'true'), home_url('/kandidaat'))); ?>" class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Aanpassen</a>
                                             <?php endif; ?>
-                                            <a href="<?php echo esc_url(add_query_arg(array('weeknummer' => $weeknummer, 'kandidaat_id' => $user_id, 'edit' => 'true'), home_url('/kandidaat'))); ?>" class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Aanpassen</a>
                                         </div>
                                     </td>
                                 </tr>
