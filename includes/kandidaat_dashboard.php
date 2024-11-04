@@ -53,20 +53,20 @@ function hours_registration_user_form()
         </div>
         <div class="mt-6 border-t border-gray-100">
             <dl class="divide-y divide-gray-100">
-                <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                <div class="px-4 py-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
                     <dt class="text-sm font-medium leading-6 text-gray-900">Naam</dt>
                     <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0"><?php echo esc_html($user_name); ?></dd>
                 </div>
-                <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                <div class="px-4 py-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
                     <dt class="text-sm font-medium leading-6 text-gray-900">E-mailadres</dt>
                     <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0"><?php echo esc_html($user_email); ?></dd>
                 </div>
-                <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                <div class="px-4 py-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
                     <dt class="text-sm font-medium leading-6 text-gray-900">Opdrachtgevernaam</dt>
                     <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0"><?php echo esc_html($opdrachtgever_naam); ?></dd>
                 </div>
                 <?php if (!empty($ingediende_weken)): ?>
-                    <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                    <div class="px-4 py-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
                         <dt class="text-sm font-medium leading-6 text-gray-900">Ingediende weken</dt>
                         <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
                             <ul class="list-inside list-none">
@@ -80,7 +80,7 @@ function hours_registration_user_form()
                 <form method="post" action="" class="mt-4">
                     <input type="hidden" name="old_weeknummer" value="<?php echo esc_attr($weeknummer); ?>">
                     <input type="hidden" name="kandidaat_id" value="<?php echo esc_attr($kandidaat_id); ?>">
-                    <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                    <div class="px-4 py-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
                         <dt class="text-sm font-medium leading-6 text-gray-900">
                             <label for="weeknummer">Weeknummer:</label>
                         </dt>
@@ -96,7 +96,7 @@ function hours_registration_user_form()
                     <?php
                     $dagen = ['maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag', 'zondag'];
                     foreach ($dagen as $dag): ?>
-                        <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                        <div class="px-4 py-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
                             <dt class="text-sm font-medium leading-6 text-gray-900">
                                 <label for="uren_<?php echo $dag; ?>">Uren <?php echo ucfirst($dag); ?>:</label>
                             </dt>
@@ -106,7 +106,7 @@ function hours_registration_user_form()
                         </div>
                     <?php endforeach; ?>
 
-                    <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                    <div class="px-4 py-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
                         <dt class="text-sm font-medium leading-6 text-gray-900"></dt>
                         <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
                             <button type="submit" name="uren_submit" class="bg-black hover:bg-gray-800 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"><?php echo $is_edit_mode ? 'Uren aanpassen' : 'Uren registreren'; ?></button>
