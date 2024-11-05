@@ -24,11 +24,7 @@ function hours_registration_client_dashboard()
         return '<p>Je hebt geen toestemming om deze pagina te bekijken.</p>';
     }
 
-    if (!session_id()) {
-        session_start();
-    }
-
-    if (!isset($_GET['token']) || !isset($_SESSION['opdrachtgever_token']) || $_GET['token'] !== $_SESSION['opdrachtgever_token']) {
+    if (!isset($_GET['token']) || !get_transient('opdrachtgever_token_' . $current_user->ID) || $_GET['token'] !== get_transient('opdrachtgever_token_' . $current_user->ID)) {
         return '<p>Oeps! Kies een gekoppelde kandidaat, om deze pagina te kunnen zien.</p>';
     }
 
