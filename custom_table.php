@@ -9,6 +9,7 @@ function urenregistratie_create_custom_table()
         id mediumint(9) NOT NULL AUTO_INCREMENT,
         user_id bigint(20) NOT NULL,
         weeknummer int(11) NOT NULL,
+        weekdate varchar(50) NOT NULL,
         uren text NOT NULL,
         status varchar(20) DEFAULT 'in afwachting' NOT NULL,
         date datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,

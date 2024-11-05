@@ -1,11 +1,13 @@
 <?php
 
-function enqueue_weekpicker_assets() {
+function enqueue_datepicker_assets()
+{
     wp_enqueue_style('jquery-ui-css', 'https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css');
+    wp_enqueue_style('datepicker-css', plugin_dir_url(__FILE__) . '../assets/datepicker.css');
     wp_enqueue_script('jquery-ui-datepicker');
-    wp_enqueue_script('weekpicker-js', plugin_dir_url(__FILE__) . '../assets/weekpicker.js', array('jquery', 'jquery-ui-datepicker'), null, true);
+    wp_enqueue_script('datepicker-js', plugin_dir_url(__FILE__) . '../assets/datepicker.js', array('jquery', 'jquery-ui-datepicker'), null, true);
 }
-add_action('wp_enqueue_scripts', 'enqueue_weekpicker_assets');
+add_action('wp_enqueue_scripts', 'enqueue_datepicker_assets');
 
 function hours_registration_user_form()
 {
@@ -27,10 +29,12 @@ function hours_registration_user_form()
         $user_name = $kandidaat_user->display_name;
         $user_email = $kandidaat_user->user_email;
         $opdrachtgever_naam = get_client_name($kandidaat_id);
+        $weekdate = ''; // Initialize $weekdate
     } else {
         $user_name = $current_user->display_name;
         $user_email = $current_user->user_email;
         $opdrachtgever_naam = get_client_name($current_user->ID);
+        $weekdate = ''; // Initialize $weekdate
     }
 
     $error_message = isset($_GET['error_message']) ? urldecode($_GET['error_message']) : '';
@@ -93,39 +97,42 @@ function hours_registration_user_form()
                             <label for="weeknummer">Weeknummer:</label>
                         </dt>
                         <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                            <input type="number" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="weeknummer" name="weeknummer" required min="1" max="53" oninput="updateWeekDates()" value="<?php echo esc_attr($is_edit_mode ? $weeknummer : ''); ?>">
+                            <input type="text" id="weekpicker" name="weeknummer_display" class="border border-gray-300 rounded px-2 py-1 w-full" value="<?php echo esc_attr($is_edit_mode ? 'Week ' . $weeknummer . ' ' . $weekdate : ''); ?>">
+                            <input type="hidden" id="weeknummer" name="weeknummer" value="<?php echo esc_attr($weeknummer); ?>">
+                            <input type="hidden" id="weekdate" name="weekdate" value="<?php echo esc_attr($weekdate); ?>">
                             <div id="week-dates" class="mt-2 text-sm text-gray-700"></div>
                             <?php if (!empty($error_message)): ?>
                                 <p class="text-red-500 text-xs italic"><?php echo esc_html($error_message); ?></p>
                             <?php endif; ?>
                         </dd>
                     </div>
-
-                    <?php
-                    $dagen = ['maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag', 'zondag'];
-                    foreach ($dagen as $dag): ?>
-                        <div class="px-4 py-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                            <dt class="text-sm font-medium leading-6 text-gray-900">
-                                <label for="uren_<?php echo $dag; ?>">Uren <?php echo ucfirst($dag); ?>:</label>
-                            </dt>
-                            <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                                <input type="number" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="uren_<?php echo $dag; ?>" name="uren_<?php echo $dag; ?>" min="0" max="8" value="<?php echo esc_attr($is_edit_mode ? $ingediende_uren[$dag] : ''); ?>">
-                            </dd>
-                        </div>
-                    <?php endforeach; ?>
-
-                    <div class="px-4 py-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                        <dt class="text-sm font-medium leading-6 text-gray-900"></dt>
-                        <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                            <button type="submit" name="uren_submit" class="bg-black hover:bg-gray-800 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"><?php echo $is_edit_mode ? 'Uren aanpassen' : 'Uren registreren'; ?></button>
-                            <?php if ($is_edit_mode): ?>
-                                <button type="button" onclick="history.back()" class="bg-black hover:bg-gray-800 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Terug</button>
-                            <?php endif; ?>
-                        </dd>
-                    </div>
-                </form>
-            </dl>
         </div>
+
+        <?php
+        $dagen = ['maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag', 'zondag'];
+        foreach ($dagen as $dag): ?>
+            <div class="px-4 py-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                <dt class="text-sm font-medium leading-6 text-gray-900">
+                    <label for="uren_<?php echo $dag; ?>">Uren <?php echo ucfirst($dag); ?>:</label>
+                </dt>
+                <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                    <input type="number" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="uren_<?php echo $dag; ?>" name="uren_<?php echo $dag; ?>" min="0" max="8" value="<?php echo esc_attr($is_edit_mode ? $ingediende_uren[$dag] : ''); ?>">
+                </dd>
+            </div>
+        <?php endforeach; ?>
+
+        <div class="px-4 py-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+            <dt class="text-sm font-medium leading-6 text-gray-900"></dt>
+            <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                <button type="submit" name="uren_submit" class="bg-black hover:bg-gray-800 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"><?php echo $is_edit_mode ? 'Uren aanpassen' : 'Uren registreren'; ?></button>
+                <?php if ($is_edit_mode): ?>
+                    <button type="button" onclick="history.back()" class="bg-black hover:bg-gray-800 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Terug</button>
+                <?php endif; ?>
+            </dd>
+        </div>
+        </form>
+        </dl>
+    </div>
     </div>
 <?php
 
@@ -152,6 +159,7 @@ function process_hours_submission($user_id, $user_email)
     $table_name = $wpdb->prefix . 'uren';
 
     $weeknummer = sanitize_text_field($_POST['weeknummer']);
+    $weekdate = sanitize_text_field($_POST['weekdate']);
     $uren = array(
         'maandag' => sanitize_text_field($_POST['uren_maandag']),
         'dinsdag' => sanitize_text_field($_POST['uren_dinsdag']),
@@ -178,6 +186,7 @@ function process_hours_submission($user_id, $user_email)
         array(
             'user_id' => $user_id,
             'weeknummer' => $weeknummer,
+            'weekdate' => $weekdate,
             'uren' => json_encode($uren),
             'status' => 'in afwachting'
         )
