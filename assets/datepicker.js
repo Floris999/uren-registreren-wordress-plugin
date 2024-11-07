@@ -1,33 +1,45 @@
 jQuery(document).ready(function ($) {
+  let selectedDate = new Date();
+
   $("#weekpicker").datepicker({
     showWeek: true,
     firstDay: 1,
+    dateFormat: "yy-mm-dd",
     onSelect: function (dateText, inst) {
-      var date = $(this).datepicker("getDate");
-      var weekNumber = $.datepicker.iso8601Week(date);
-      var startDate = new Date(date);
-      startDate.setDate(startDate.getDate() - startDate.getDay() + 1);
-      var endDate = new Date(startDate);
-      endDate.setDate(endDate.getDate() + 6);
-      var formattedStartDate = $.datepicker.formatDate("dd-mm-yy", startDate);
-      var formattedEndDate = $.datepicker.formatDate("dd-mm-yy", endDate);
-      $("#weeknummer").val(weekNumber);
-      $("#weekdate").val(formattedStartDate + " t/m " + formattedEndDate);
-      $(this).val(
-        "Week " +
-          weekNumber +
-          " " +
-          formattedStartDate +
-          " t/m " +
-          formattedEndDate
-      );
+      selectedDate = $(this).datepicker("getDate");
+      displayWeekInfo(selectedDate);
     },
     beforeShowDay: function (date) {
-      var cssClass = "";
-      if (date.getDay() === 1) {
-        cssClass = "ui-datepicker-week-start";
+      if (selectedDate) {
+        const startOfWeek = new Date(selectedDate);
+        startOfWeek.setDate(
+          selectedDate.getDate() - ((selectedDate.getDay() + 6) % 7)
+        );
+        const endOfWeek = new Date(startOfWeek);
+        endOfWeek.setDate(startOfWeek.getDate() + 6);
+        if (date >= startOfWeek && date <= endOfWeek) {
+          return [true, "ui-state-active", ""];
+        }
       }
-      return [true, cssClass];
+      return [true, "", ""];
     },
   });
+
+  function displayWeekInfo(date) {
+    const weekNumber = $.datepicker.iso8601Week(date);
+    let year = date.getFullYear();
+
+    const startOfWeek = new Date(date);
+    const endOfWeek = new Date(date);
+    startOfWeek.setDate(date.getDate() - ((date.getDay() + 6) % 7));
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
+
+    const startFormatted = $.datepicker.formatDate("dd-mm-yy", startOfWeek);
+    const endFormatted = $.datepicker.formatDate("dd-mm-yy", endOfWeek);
+    const weekDisplay = `Week ${weekNumber} (${startFormatted} tot ${endFormatted})`;
+
+    $("#weekpicker").val(weekDisplay);
+    $("#weeknummer").val(weekNumber);
+    $("#weekdate").val(startFormatted + " t/m " + endFormatted);
+  }
 });

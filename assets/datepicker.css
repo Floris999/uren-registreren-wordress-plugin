@@ -4,7 +4,6 @@
     font-size: 1.1em;
 }
 
-
 .ui-datepicker th {
     font-weight: normal; 
 }
@@ -30,4 +29,23 @@
 .ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default, .ui-button, html .ui-button.ui-state-disabled:hover, html .ui-button.ui-state-disabled:active {
     border: none!important;
     background: transparent!important;
-} 
+}
+
+.ui-datepicker-week-highlight {
+    background-color: #87CEFA; /* lichte blauwe kleur */
+  }
+
+.ui-datepicker-week-highlight a {
+    background-color: #1e3a8a !important;
+    color: white !important;
+}
+.ui-datepicker-week-highlight a:hover {
+    background-color: #1e3a8a !important;
+    color: white !important;
+}
+
+.ui-datepicker td .ui-state-active {
+    background-color: #87CEFA !important;
+    color: #fff !important;
+    border-radius: 50%;
+}
