@@ -160,6 +160,8 @@ function process_hours_submission($user_id, $user_email)
 
     $weeknummer = sanitize_text_field($_POST['weeknummer']);
     $weekdate = sanitize_text_field($_POST['weekdate']);
+    preg_match('/\d{4}/', $weekdate, $matches);
+    $year = $matches[0];
     $uren = array(
         'maandag' => sanitize_text_field($_POST['uren_maandag']),
         'dinsdag' => sanitize_text_field($_POST['uren_dinsdag']),
@@ -186,7 +188,7 @@ function process_hours_submission($user_id, $user_email)
         array(
             'user_id' => $user_id,
             'weeknummer' => $weeknummer,
-            'weekdate' => $weekdate,
+            'jaar' => $year,
             'uren' => json_encode($uren),
             'status' => 'in afwachting'
         )
@@ -209,6 +211,9 @@ function process_opdrachtgever_submission($kandidaat_id, $user_email)
 
     $weeknummer = sanitize_text_field($_POST['weeknummer']);
     $old_weeknummer = sanitize_text_field($_POST['old_weeknummer']);
+    $weekdate = sanitize_text_field($_POST['weekdate']);
+    preg_match('/\d{4}/', $weekdate, $matches);
+    $year = $matches[0];
     $uren = array(
         'maandag' => sanitize_text_field($_POST['uren_maandag']),
         'dinsdag' => sanitize_text_field($_POST['uren_dinsdag']),
@@ -223,6 +228,7 @@ function process_opdrachtgever_submission($kandidaat_id, $user_email)
         $table_name,
         array(
             'weeknummer' => $weeknummer,
+            'jaar' => $year,
             'uren' => json_encode($uren),
             'status' => 'goedgekeurd'
         ),
