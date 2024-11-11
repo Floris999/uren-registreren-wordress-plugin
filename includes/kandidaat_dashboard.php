@@ -38,6 +38,8 @@ function hours_registration_user_form()
     }
 
     $error_message = isset($_GET['error_message']) ? urldecode($_GET['error_message']) : '';
+    $success_message = isset($_GET['success_message']) ? urldecode($_GET['success_message']) : '';
+
     if (isset($_POST['uren_submit'])) {
         if ($is_edit_mode) {
             $error_message = process_opdrachtgever_submission($kandidaat_id, $user_email);
@@ -59,6 +61,12 @@ function hours_registration_user_form()
     ob_start();
 ?>
     <div>
+        <?php if (!empty($success_message)): ?>
+            <p class="text-green-500 text-xs italic"><?php echo esc_html($success_message); ?></p>
+        <?php endif; ?>
+        <?php if (!empty($error_message)): ?>
+            <p class="text-red-500 text-xs italic"><?php echo esc_html($error_message); ?></p>
+        <?php endif; ?>
         <div class="px-4 sm:px-0">
             <h3 class="text-base font-semibold leading-7 text-gray-900"><?php echo $is_edit_mode ? 'Uren aanpassen' : 'Urenregistratie'; ?></h3>
             <p class="mt-1 max-w-2xl text-sm leading-6 text-gray-500"><?php echo $is_edit_mode ? 'Pas de gewerkte uren aan voor de week.' : 'Vul je gewerkte uren in voor de week.'; ?></p>
@@ -101,9 +109,6 @@ function hours_registration_user_form()
                             <input type="hidden" id="weeknummer" name="weeknummer" value="<?php echo esc_attr($weeknummer); ?>">
                             <input type="hidden" id="weekdate" name="weekdate" value="<?php echo esc_attr($weekdate); ?>">
                             <div id="week-dates" class="mt-2 text-sm text-gray-700"></div>
-                            <?php if (!empty($error_message)): ?>
-                                <p class="text-red-500 text-xs italic"><?php echo esc_html($error_message); ?></p>
-                            <?php endif; ?>
                         </dd>
                     </div>
         </div>
@@ -160,6 +165,7 @@ function process_hours_submission($user_id, $user_email)
 
     $weeknummer = sanitize_text_field($_POST['weeknummer']);
     $weekdate = sanitize_text_field($_POST['weekdate']);
+    // Extract the year from the weekdate
     preg_match('/\d{4}/', $weekdate, $matches);
     $year = $matches[0];
     $uren = array(
@@ -179,7 +185,7 @@ function process_hours_submission($user_id, $user_email)
     ));
 
     if ($existing_entry > 0) {
-        wp_redirect(add_query_arg('error_message', urlencode('Je hebt al uren ingediend voor week ' . esc_html($weeknummer) . '.'), home_url('/kandidaat')));
+        wp_redirect(add_query_arg('error_message', urlencode('Je hebt al uren ingediend voor week ' . esc_html($weeknummer) . '.'), site_url('/kandidaat')));
         exit;
     }
 
@@ -200,7 +206,7 @@ function process_hours_submission($user_id, $user_email)
 
     send_candidate_notification_email($record_id);
 
-    wp_redirect(home_url('/kandidaat'));
+    wp_redirect(add_query_arg('success_message', urlencode('Bedankt voor het doorgeven!'), site_url('/kandidaat')));
     exit;
 }
 
@@ -212,6 +218,7 @@ function process_opdrachtgever_submission($kandidaat_id, $user_email)
     $weeknummer = sanitize_text_field($_POST['weeknummer']);
     $old_weeknummer = sanitize_text_field($_POST['old_weeknummer']);
     $weekdate = sanitize_text_field($_POST['weekdate']);
+    // Extract the year from the weekdate
     preg_match('/\d{4}/', $weekdate, $matches);
     $year = $matches[0];
     $uren = array(
@@ -238,7 +245,7 @@ function process_opdrachtgever_submission($kandidaat_id, $user_email)
         )
     );
 
-    wp_redirect(home_url('/opdrachtgever'));
+    wp_redirect(site_url('/opdrachtgever'));
     exit;
 }
 
