@@ -13,18 +13,6 @@ function hours_registration_admin_menu()
 }
 add_action('admin_menu', 'hours_registration_admin_menu');
 
-if (!function_exists('get_start_and_end_date')) {
-    function get_start_and_end_date($week, $year)
-    {
-        $dto = new DateTime();
-        $dto->setISODate($year, $week);
-        $start_date = $dto->format('d-m-Y');
-        $dto->modify('+6 days');
-        $end_date = $dto->format('d-m-Y');
-        return array($start_date, $end_date);
-    }
-}
-
 function hours_registration_admin_page()
 {
     global $wpdb;
@@ -86,7 +74,7 @@ function hours_registration_admin_page()
         <tr>
             <th>Naam</th>
             <th><a href="' . esc_url(add_query_arg(array('order_by' => 'weeknummer', 'order' => $next_order))) . '" style="text-decoration: none; color: inherit;">Weeknummer ' . ($order_by === 'weeknummer' ? ($order === 'ASC' ? '▲' : '▼') : '') . '</a></th>
-            <th>Weekdatum</th>
+            <th>Jaar</th>
             <th>Ingediende uren</th>
             <th>Totaal uren</th>
             <th>Status</th>
@@ -103,6 +91,7 @@ function hours_registration_admin_page()
             $entry_id = $row['id'];
             $user_id = $row['user_id'];
             $weeknummer = $row['weeknummer'];
+            $jaar = $row['jaar'];
             $uren = json_decode($row['uren'], true);
             $status = $row['status'] ?: 'in afwachting';
             $datum_aangevraagd = date('d-m-Y', strtotime($row['date']));
@@ -134,12 +123,10 @@ function hours_registration_admin_page()
                         $totaal_uren += (int)$uren_per_dag;
                     }
 
-                    list($start_date, $end_date) = get_start_and_end_date($weeknummer, date('Y'));
-
                     echo '<tr>';
                     echo '<td>' . esc_html($naam) . '</td>';
                     echo '<td>' . esc_html($weeknummer) . '</td>';
-                    echo '<td>' . esc_html($start_date) . ' <br> ' . esc_html($end_date) . '</td>';
+                    echo '<td>' . esc_html($jaar) . '</td>';
                     echo '<td>' . $ingediende_uren . '</td>';
                     echo '<td>' . esc_html($totaal_uren) . '</td>';
                     echo '<td>' . esc_html($status) . '</td>';
