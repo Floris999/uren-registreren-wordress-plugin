@@ -29,7 +29,7 @@ function hours_registration_user_form()
         $user_name = $kandidaat_user->display_name;
         $user_email = $kandidaat_user->user_email;
         $opdrachtgever_naam = get_client_name($kandidaat_id);
-        $year= ''; 
+        $year = '';
     } else {
         $user_name = $current_user->display_name;
         $user_email = $current_user->user_email;
