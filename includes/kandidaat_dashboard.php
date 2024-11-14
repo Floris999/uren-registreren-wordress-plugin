@@ -6,6 +6,8 @@ function enqueue_datepicker_assets()
     wp_enqueue_style('datepicker-css', plugin_dir_url(__FILE__) . '../assets/datepicker.css');
     wp_enqueue_script('jquery-ui-datepicker');
     wp_enqueue_script('datepicker-js', plugin_dir_url(__FILE__) . '../assets/datepicker.js', array('jquery', 'jquery-ui-datepicker'), null, true);
+    wp_enqueue_script('ajax-script', plugin_dir_url(__FILE__) . '../assets/ajax.js', array('jquery'), null, true);
+    wp_localize_script('ajax-script', 'ajax_object', array('ajax_url' => admin_url('admin-ajax.php')));
 }
 add_action('wp_enqueue_scripts', 'enqueue_datepicker_assets');
 
@@ -30,43 +32,20 @@ function hours_registration_user_form()
         $user_email = $kandidaat_user->user_email;
         $opdrachtgever_naam = get_client_name($kandidaat_id);
         $year = '';
+        $ingediende_uren = get_submitted_hours($kandidaat_id, $weeknummer);
     } else {
         $user_name = $current_user->display_name;
         $user_email = $current_user->user_email;
         $opdrachtgever_naam = get_client_name($current_user->ID);
         $year = '';
+        $ingediende_uren = array();
     }
 
-    $error_message = isset($_GET['error_message']) ? urldecode($_GET['error_message']) : '';
-    $success_message = isset($_GET['success_message']) ? urldecode($_GET['success_message']) : '';
-
-    if (isset($_POST['uren_submit'])) {
-        if ($is_edit_mode) {
-            $error_message = process_opdrachtgever_submission($kandidaat_id, $user_email);
-        } else {
-            $error_message = process_hours_submission($current_user->ID, $user_email);
-        }
-    }
-
-    if ($is_edit_mode && $weeknummer && $kandidaat_id) {
-        $ingediende_uren = get_submitted_hours($kandidaat_id, $weeknummer);
-    }
-
-    $ingediende_weken = get_submitted_weeks($current_user->ID);
-
-    usort($ingediende_weken, function ($a, $b) {
-        return $b['weeknummer'] - $a['weeknummer'];
-    });
+    $ingediende_weken = get_submitted_weeks($kandidaat_id);
 
     ob_start();
 ?>
     <div>
-        <?php if (!empty($success_message)): ?>
-            <p class="text-green-500 text-xs italic"><?php echo esc_html($success_message); ?></p>
-        <?php endif; ?>
-        <?php if (!empty($error_message)): ?>
-            <p class="text-red-500 text-xs italic"><?php echo esc_html($error_message); ?></p>
-        <?php endif; ?>
         <div class="px-4 sm:px-0">
             <h3 class="text-base font-semibold leading-7 text-gray-900"><?php echo $is_edit_mode ? 'Uren aanpassen' : 'Urenregistratie'; ?></h3>
             <p class="mt-1 max-w-2xl text-sm leading-6 text-gray-500"><?php echo $is_edit_mode ? 'Pas de gewerkte uren aan voor de week.' : 'Vul je gewerkte uren in voor de week.'; ?></p>
@@ -97,7 +76,9 @@ function hours_registration_user_form()
                         </dd>
                     </div>
                 <?php endif; ?>
-                <form method="post" action="" class="mt-4">
+                <form id="urenregistratie-form" method="post" class="mt-4">
+                    <input type="hidden" name="action" value="process_hours_submission">
+                    <input type="hidden" name="role" value="<?php echo in_array('opdrachtgever', $current_user->roles) ? 'opdrachtgever' : 'kandidaat'; ?>">
                     <input type="hidden" name="old_weeknummer" value="<?php echo esc_attr($weeknummer); ?>">
                     <input type="hidden" name="kandidaat_id" value="<?php echo esc_attr($kandidaat_id); ?>">
                     <div class="px-4 py-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
@@ -111,33 +92,32 @@ function hours_registration_user_form()
                             <div id="week-dates" class="mt-2 text-sm text-gray-700"></div>
                         </dd>
                     </div>
-        </div>
 
-        <?php
-        $dagen = ['maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag', 'zondag'];
-        foreach ($dagen as $dag): ?>
-            <div class="px-4 py-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                <dt class="text-sm font-medium leading-6 text-gray-900">
-                    <label for="uren_<?php echo $dag; ?>">Uren <?php echo ucfirst($dag); ?>:</label>
-                </dt>
-                <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                    <input type="number" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="uren_<?php echo $dag; ?>" name="uren_<?php echo $dag; ?>" min="0" max="8" value="<?php echo esc_attr($is_edit_mode ? $ingediende_uren[$dag] : ''); ?>">
-                </dd>
-            </div>
-        <?php endforeach; ?>
+                    <?php
+                    $dagen = ['maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag', 'zondag'];
+                    foreach ($dagen as $dag): ?>
+                        <div class="px-4 py-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                            <dt class="text-sm font-medium leading-6 text-gray-900">
+                                <label for="uren_<?php echo $dag; ?>">Uren <?php echo ucfirst($dag); ?>:</label>
+                            </dt>
+                            <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                                <input type="number" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="uren_<?php echo $dag; ?>" name="uren_<?php echo $dag; ?>" min="0" max="8" value="<?php echo esc_attr($is_edit_mode ? $ingediende_uren[$dag] : ''); ?>">
+                            </dd>
+                        </div>
+                    <?php endforeach; ?>
 
-        <div class="px-4 py-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-            <dt class="text-sm font-medium leading-6 text-gray-900"></dt>
-            <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                <button type="submit" name="uren_submit" class="bg-black hover:bg-gray-800 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"><?php echo $is_edit_mode ? 'Uren aanpassen' : 'Uren registreren'; ?></button>
-                <?php if ($is_edit_mode): ?>
-                    <button type="button" onclick="history.back()" class="bg-black hover:bg-gray-800 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Terug</button>
-                <?php endif; ?>
-            </dd>
+                    <div class="px-4 py-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                        <dt class="text-sm font-medium leading-6 text-gray-900"></dt>
+                        <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                            <button type="submit" name="uren_submit" class="bg-black hover:bg-gray-800 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"><?php echo $is_edit_mode ? 'Uren aanpassen' : 'Uren registreren'; ?></button>
+                            <?php if ($is_edit_mode): ?>
+                                <button type="button" onclick="history.back()" class="bg-black hover:bg-gray-800 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Terug</button>
+                            <?php endif; ?>
+                        </dd>
+                    </div>
+                </form>
+            </dl>
         </div>
-        </form>
-        </dl>
-    </div>
     </div>
 <?php
 
@@ -158,11 +138,12 @@ function get_client_name($kandidaat_id)
     return 'Geen opdrachtgever gevonden';
 }
 
-function process_hours_submission($user_id, $user_email)
+function process_hours_submission()
 {
     global $wpdb;
     $table_name = $wpdb->prefix . 'uren';
 
+    $user_id = get_current_user_id();
     $weeknummer = sanitize_text_field($_POST['weekNumber']);
     $year = sanitize_text_field($_POST['year']);
     $uren = array(
@@ -176,14 +157,14 @@ function process_hours_submission($user_id, $user_email)
     );
 
     $existing_entry = $wpdb->get_var($wpdb->prepare(
-        "SELECT COUNT(*) FROM $table_name WHERE user_id = %d AND weeknummer = %d",
+        "SELECT COUNT(*) FROM $table_name WHERE user_id = %d AND weeknummer = %d AND jaar = %d",
         $user_id,
-        $weeknummer
+        $weeknummer,
+        $year
     ));
 
     if ($existing_entry > 0) {
-        wp_redirect(add_query_arg('error_message', urlencode('Je hebt al uren ingediend voor week ' . esc_html($weeknummer) . '.'), site_url('/kandidaat')));
-        exit;
+        wp_send_json_error('Je hebt al uren ingediend voor week ' . esc_html($weeknummer) . '.');
     }
 
     $wpdb->insert(
@@ -200,18 +181,17 @@ function process_hours_submission($user_id, $user_email)
     $record_id = $wpdb->insert_id;
 
     send_hours_submission_email_custom_table($record_id);
-
     send_candidate_notification_email($record_id);
 
-    wp_redirect(add_query_arg('success_message', urlencode('Bedankt voor het doorgeven!'), site_url('/kandidaat')));
-    exit;
+    wp_send_json_success('Bedankt voor het doorgeven!');
 }
 
-function process_opdrachtgever_submission($kandidaat_id, $user_email)
+function process_opdrachtgever_submission()
 {
     global $wpdb;
     $table_name = $wpdb->prefix . 'uren';
 
+    $kandidaat_id = sanitize_text_field($_POST['kandidaat_id']);
     $weeknummer = sanitize_text_field($_POST['weekNumber']);
     $old_weeknummer = sanitize_text_field($_POST['old_weeknummer']);
     $year = sanitize_text_field($_POST['year']);
@@ -239,8 +219,7 @@ function process_opdrachtgever_submission($kandidaat_id, $user_email)
         )
     );
 
-    wp_redirect(add_query_arg('success_message', urlencode('Bedankt voor het doorgeven!'), site_url('/opdrachtgever')));
-    exit;
+    wp_send_json_success(array('message' => 'Bedankt voor het accorderen!', 'redirect' => site_url('/opdrachtgever')));
 }
 
 function get_submitted_weeks($user_id)
@@ -275,3 +254,15 @@ function get_submitted_hours($kandidaat_id, $weeknummer)
 
     return json_decode($result['uren'], true);
 }
+
+function handle_ajax_request()
+{
+    if ($_POST['role'] === 'opdrachtgever') {
+        process_opdrachtgever_submission();
+    } else {
+        process_hours_submission();
+    }
+}
+
+add_action('wp_ajax_handle_ajax_request', 'handle_ajax_request');
+add_action('wp_ajax_nopriv_handle_ajax_request', 'handle_ajax_request');
