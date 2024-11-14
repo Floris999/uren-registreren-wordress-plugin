@@ -29,12 +29,12 @@ function hours_registration_user_form()
         $user_name = $kandidaat_user->display_name;
         $user_email = $kandidaat_user->user_email;
         $opdrachtgever_naam = get_client_name($kandidaat_id);
-        $weekdate = ''; // Initialize $weekdate
+        $year= ''; 
     } else {
         $user_name = $current_user->display_name;
         $user_email = $current_user->user_email;
         $opdrachtgever_naam = get_client_name($current_user->ID);
-        $weekdate = ''; // Initialize $weekdate
+        $year = '';
     }
 
     $error_message = isset($_GET['error_message']) ? urldecode($_GET['error_message']) : '';
@@ -105,9 +105,9 @@ function hours_registration_user_form()
                             <label for="weeknummer">Weeknummer:</label>
                         </dt>
                         <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                            <input type="text" id="weekpicker" name="weeknummer_display" class="border border-gray-300 rounded px-2 py-1 w-full" value="<?php echo esc_attr($is_edit_mode ? 'Week ' . $weeknummer . ' ' . $weekdate : ''); ?>">
-                            <input type="hidden" id="weeknummer" name="weeknummer" value="<?php echo esc_attr($weeknummer); ?>">
-                            <input type="hidden" id="weekdate" name="weekdate" value="<?php echo esc_attr($weekdate); ?>">
+                            <input type="text" id="weekpicker" name="weeknummer_display" class="border border-gray-300 rounded px-2 py-1 w-full" value="<?php echo esc_attr($is_edit_mode ? 'Week ' . $weeknummer : ''); ?>" readonly>
+                            <input type="hidden" id="weekNumber" name="weekNumber" value="<?php echo esc_attr($weeknummer); ?>">
+                            <input type="hidden" id="year" name="year" value="<?php echo esc_attr($year); ?>">
                             <div id="week-dates" class="mt-2 text-sm text-gray-700"></div>
                         </dd>
                     </div>
@@ -163,11 +163,8 @@ function process_hours_submission($user_id, $user_email)
     global $wpdb;
     $table_name = $wpdb->prefix . 'uren';
 
-    $weeknummer = sanitize_text_field($_POST['weeknummer']);
-    $weekdate = sanitize_text_field($_POST['weekdate']);
-    // Extract the year from the weekdate
-    preg_match('/\d{4}/', $weekdate, $matches);
-    $year = $matches[0];
+    $weeknummer = sanitize_text_field($_POST['weekNumber']);
+    $year = sanitize_text_field($_POST['year']);
     $uren = array(
         'maandag' => sanitize_text_field($_POST['uren_maandag']),
         'dinsdag' => sanitize_text_field($_POST['uren_dinsdag']),
@@ -215,12 +212,9 @@ function process_opdrachtgever_submission($kandidaat_id, $user_email)
     global $wpdb;
     $table_name = $wpdb->prefix . 'uren';
 
-    $weeknummer = sanitize_text_field($_POST['weeknummer']);
+    $weeknummer = sanitize_text_field($_POST['weekNumber']);
     $old_weeknummer = sanitize_text_field($_POST['old_weeknummer']);
-    $weekdate = sanitize_text_field($_POST['weekdate']);
-    // Extract the year from the weekdate
-    preg_match('/\d{4}/', $weekdate, $matches);
-    $year = $matches[0];
+    $year = sanitize_text_field($_POST['year']);
     $uren = array(
         'maandag' => sanitize_text_field($_POST['uren_maandag']),
         'dinsdag' => sanitize_text_field($_POST['uren_dinsdag']),
@@ -245,7 +239,7 @@ function process_opdrachtgever_submission($kandidaat_id, $user_email)
         )
     );
 
-    wp_redirect(site_url('/opdrachtgever'));
+    wp_redirect(add_query_arg('success_message', urlencode('Bedankt voor het doorgeven!'), site_url('/opdrachtgever')));
     exit;
 }
 

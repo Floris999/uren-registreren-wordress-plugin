@@ -29,6 +29,12 @@ jQuery(document).ready(function ($) {
     const weekNumber = $.datepicker.iso8601Week(date);
     let year = date.getFullYear();
 
+    if (weekNumber === 1 && date.getMonth() === 11) {
+      year += 1;
+    } else if (weekNumber >= 52 && date.getMonth() === 0) {
+      year -= 1;
+    }
+
     const startOfWeek = new Date(date);
     const endOfWeek = new Date(date);
     startOfWeek.setDate(date.getDate() - ((date.getDay() + 6) % 7));
@@ -39,7 +45,7 @@ jQuery(document).ready(function ($) {
     const weekDisplay = `Week ${weekNumber} (${startFormatted} tot ${endFormatted})`;
 
     $("#weekpicker").val(weekDisplay);
-    $("#weeknummer").val(weekNumber);
-    $("#weekdate").val(startFormatted + " t/m " + endFormatted);
+    $("#weekNumber").val(weekNumber);
+    $("#year").val(year);
   }
 });
