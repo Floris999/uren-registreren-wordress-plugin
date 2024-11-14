@@ -63,10 +63,31 @@ function hours_registration_admin_page()
 
     $next_order = ($order === 'ASC') ? 'DESC' : 'ASC';
 
-    $results = $wpdb->get_results("SELECT * FROM $table_name ORDER BY $order_by $order", ARRAY_A);
+    // Paginering
+    $items_per_page = isset($_GET['items_per_page']) ? intval($_GET['items_per_page']) : 10;
+    $current_page = isset($_GET['paged']) ? intval($_GET['paged']) : 1;
+    $offset = ($current_page - 1) * $items_per_page;
+
+    $total_items = $wpdb->get_var("SELECT COUNT(*) FROM $table_name");
+    $total_pages = ceil($total_items / $items_per_page);
+
+    $results = $wpdb->get_results($wpdb->prepare("SELECT * FROM $table_name ORDER BY $order_by $order LIMIT %d OFFSET %d", $items_per_page, $offset), ARRAY_A);
 
     echo '<div class="wrap">';
     echo '<h1>Urenoverzicht</h1>';
+
+    // Selectie voor items per pagina
+    echo '<form method="get">';
+    echo '<input type="hidden" name="page" value="uren-overzicht">';
+    echo '<label for="items_per_page">Items per pagina:</label>';
+    echo '<select name="items_per_page" id="items_per_page" onchange="this.form.submit()">';
+    $options = array(10, 20, 50, 100);
+    foreach ($options as $option) {
+        $selected = ($option == $items_per_page) ? 'selected' : '';
+        echo "<option value=\"$option\" $selected>$option</option>";
+    }
+    echo '</select>';
+    echo '</form>';
 
     if (!empty($results)) {
         echo '<table class="wp-list-table widefat fixed striped">';
@@ -156,6 +177,18 @@ function hours_registration_admin_page()
         }
         echo '</tbody>';
         echo '</table>';
+
+        // Paginering
+        $pagination_args = array(
+            'base' => add_query_arg('paged', '%#%'),
+            'format' => '',
+            'total' => $total_pages,
+            'current' => $current_page,
+            'prev_text' => __('&laquo; Vorige'),
+            'next_text' => __('Volgende &raquo;'),
+        );
+
+        echo '<div class="tablenav"><div class="tablenav-pages">' . paginate_links($pagination_args) . '</div></div>';
     } else {
         echo '<p>Geen uren gevonden.</p>';
     }
