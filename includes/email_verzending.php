@@ -61,7 +61,9 @@ function send_hours_submission_email_custom_table($record_id)
     $message .= 'Er zijn nieuwe uren ingediend door ' . $user_name . " voor week " . $uren_data->weeknummer . " (van " . $start_date . " tot " . $end_date . "):\n\n";
     $message .= $uren_leesbaar;
     $message .= "\n\nTotaal aantal uren: " . $totaal_uren . " uur";
-    $message .= "\n\nBekijk de ingediende uren in het dashboard: " . site_url('/wp-admin') . "\n\n";
+    $message .= "\n\nIn ons portaal kun je de ingediende uren goedkeuren of evt. eenmalig aanpassen: " . site_url('/wp-admin') . "\n\n";
+    $message .= "Wil je de uren uiterlijk op maandag controleren en goedkeuren?\n";
+    $message .= "Bedankt!\n\n";
     $message .= "Met vriendelijke groet,\n";
     $message .= get_bloginfo('name');
 
