@@ -24,9 +24,14 @@ function send_candidate_notification_email($record_id)
 
 
     $login_url = wp_login_url();
-    $message = 'Beste ' . $user_name . ',<br><br>';
-    $message .= 'Je hebt nieuwe uren ingediend voor week ' . $uren_data->weeknummer . '.<br><br>';
-    $message .= 'Log in om de status van je uren te bekijken: <a href="' . $login_url . '">' . $login_url . '</a>';
+    $message = 'Hi ' . $user_name . ',<br><br>';
+    $message .= 'Bedankt voor je ingevulde uren voor week ' . $uren_data->weeknummer . '.<br><br>';
+    $message .= 'Je opdrachtgever ontvangt ook een email met daarin een overzicht van je ingevulde uren.<br><br>';
+    $message .= 'De status van je uren kun je bekijken door in te loggen in ons portaal. Ga dan naar: <a href="' . $login_url . '">' . $login_url . '</a><br><br>';
+    $message .= 'Zijn je uren op maandag aan het einde van de middag nog niet goedgekeurd?<br>';
+    $message .= 'Geef dit dan gerust aan ons (en je opdrachtgever) door.<br><br>';
+    $message .= "Met vriendelijke groet,<br>";
+    $message .= get_bloginfo('name');
 
     $headers = array('Content-Type: text/html; charset=UTF-8');
 
