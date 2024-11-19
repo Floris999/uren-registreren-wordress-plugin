@@ -100,7 +100,7 @@ function hours_registration_client_dashboard()
 ?>
     <div class="flex flex-col mb-1 sm:mb-0">
         <h1 class="text-2xl leading-tight">Hallo <?php echo esc_html($current_user->display_name); ?></h1>
-        <p>De volgende uren zijn door jouw kandidaten geregistreerd.</p>
+        <p>De volgende uren zijn door jouw talenten geregistreerd.</p>
     </div>
     <div class="overflow-x-auto">
         <table class="min-w-full table-auto">

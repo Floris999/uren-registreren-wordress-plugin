@@ -35,7 +35,7 @@ function hours_registration_client_overview()
 ?>
     <div class="flex flex-col mb-1 sm:mb-0">
         <h1 class="text-2xl leading-tight">Hallo <?php echo esc_html($current_user->display_name); ?></h1>
-        <p>Hier is een overzicht van jouw gekoppelde kandidaten. Klik op een kandidaat om de geregistreerde uren te bekijken.</p>
+        <p>Hier is een overzicht van jouw gekoppelde talenten. Klik op een talent om de geregistreerde uren te bekijken.</p>
     </div>
     <div class="overflow-x-auto">
         <table class="min-w-full table-auto">
