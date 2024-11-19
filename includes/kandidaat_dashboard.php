@@ -232,7 +232,7 @@ function process_opdrachtgever_submission()
             'weeknummer' => $old_weeknummer
         )
     );
-
+    send_opdrachtgever_submission_email($kandidaat_id, $weeknummer, $year, $uren);
     wp_send_json_success(array('message' => 'Bedankt voor het accorderen!', 'redirect' => site_url('/opdrachtgever')));
 }
 

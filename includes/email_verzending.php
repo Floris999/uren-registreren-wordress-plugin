@@ -74,3 +74,38 @@ function send_hours_submission_email_custom_table($record_id)
         wp_mail($extra_notification_email, $subject, nl2br($message), array('Content-Type: text/html; charset=UTF-8'));
     }
 }
+
+function send_opdrachtgever_submission_email($kandidaat_id, $weeknummer, $year, $uren)
+{
+    $saved_email = get_option('urenregistratie_notification_email', '');
+    if (!$saved_email) {
+        return;
+    }
+
+    $user_info = get_userdata($kandidaat_id);
+    $user_name = $user_info ? $user_info->display_name : 'Onbekende gebruiker';
+
+    $opdrachtgever_id = get_user_meta($kandidaat_id, 'opdrachtgever_id', true);
+    $opdrachtgever_info = get_userdata($opdrachtgever_id);
+    $opdrachtgever_name = $opdrachtgever_info ? $opdrachtgever_info->display_name : 'Onbekende opdrachtgever';
+
+    list($start_date, $end_date) = get_start_and_end_date($weeknummer, $year);
+
+    $uren_leesbaar = '';
+    $totaal_uren = 0;
+    foreach ($uren as $dag => $uren_per_dag) {
+        $uren_leesbaar .= ucfirst($dag) . ': ' . esc_html($uren_per_dag) . ' uur<br>';
+        $totaal_uren += (int)$uren_per_dag;
+    }
+
+    $subject = 'Uren aangepast ' . $weeknummer;
+    $message = 'Beste beheerder' .  ",<br><br>";
+    $message .= 'De uren van ' . $user_name . ' voor week ' . $weeknummer . ' (van ' . $start_date . ' tot ' . $end_date . ') zijn aangepast door opdrachtgever ' . $opdrachtgever_name . '.<br><br>';
+    $message .= 'Hier is een overzicht van de aangepaste uren:<br><br>';
+    $message .= $uren_leesbaar;
+    $message .= '<br><br>Totaal aantal uren: ' . $totaal_uren . ' uur<br><br>';
+    $message .= "Met vriendelijke groet,<br>";
+    $message .= get_bloginfo('name');
+
+    wp_mail($saved_email, $subject, $message, array('Content-Type: text/html; charset=UTF-8'));
+}
