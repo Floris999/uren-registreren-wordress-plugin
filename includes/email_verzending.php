@@ -98,7 +98,7 @@ function send_opdrachtgever_submission_email($kandidaat_id, $weeknummer, $year, 
         $totaal_uren += (int)$uren_per_dag;
     }
 
-    $subject = 'Uren aangepast ' . $weeknummer;
+    $subject = 'Uren aangepast ';
     $message = 'Beste beheerder' .  ",<br><br>";
     $message .= 'De uren van ' . $user_name . ' voor week ' . $weeknummer . ' (van ' . $start_date . ' tot ' . $end_date . ') zijn aangepast door opdrachtgever ' . $opdrachtgever_name . '.<br><br>';
     $message .= 'Hier is een overzicht van de aangepaste uren:<br><br>';
