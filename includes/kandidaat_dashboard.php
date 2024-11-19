@@ -11,6 +11,20 @@ function enqueue_datepicker_assets()
 }
 add_action('wp_enqueue_scripts', 'enqueue_datepicker_assets');
 
+function get_year_for_candidate($kandidaat_id, $weeknummer)
+{
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'uren';
+
+    $result = $wpdb->get_var($wpdb->prepare(
+        "SELECT jaar FROM $table_name WHERE user_id = %d AND weeknummer = %d",
+        $kandidaat_id,
+        $weeknummer
+    ));
+
+    return $result ? intval($result) : date('Y');
+}
+
 function hours_registration_user_form()
 {
     if (!is_user_logged_in()) {
@@ -88,7 +102,7 @@ function hours_registration_user_form()
                         <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
                             <input type="text" id="weekpicker" name="weeknummer_display" class="border border-gray-300 rounded px-2 py-1 w-full" value="<?php echo esc_attr($is_edit_mode ? 'Week ' . $weeknummer : ''); ?>" readonly>
                             <input type="hidden" id="weekNumber" name="weekNumber" value="<?php echo esc_attr($weeknummer); ?>">
-                            <input type="hidden" id="year" name="year" value="<?php echo esc_attr($year); ?>">
+                            <input type="hidden" id="year" name="year" value="<?php echo esc_attr(get_year_for_candidate($kandidaat_id, $weeknummer)); ?>">
                             <div id="week-dates" class="mt-2 text-sm text-gray-700"></div>
                         </dd>
                     </div>
