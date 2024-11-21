@@ -39,9 +39,6 @@ function hours_registration_client_dashboard()
             array('status' => $status),
             array('id' => $entry_id)
         );
-
-        header('Location: /opdrachtgever/');
-        exit;
     }
 
     $kandidaat_id = isset($_GET['kandidaat_id']) ? intval($_GET['kandidaat_id']) : 0;
