@@ -40,7 +40,7 @@ function hours_registration_client_dashboard()
             array('id' => $entry_id)
         );
 
-        header('Location: ' . $_SERVER['REQUEST_URI']);
+        header('Location: /opdrachtgever/');
         exit;
     }
 
