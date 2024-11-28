@@ -115,7 +115,7 @@ function hours_registration_user_form()
                                 <label for="uren_<?php echo $dag; ?>">Uren <?php echo ucfirst($dag); ?>:</label>
                             </dt>
                             <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                                <input type="number" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="uren_<?php echo $dag; ?>" name="uren_<?php echo $dag; ?>" min="0" max="8" value="<?php echo esc_attr($is_edit_mode ? $ingediende_uren[$dag] : ''); ?>">
+                                <input type="number" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="uren_<?php echo $dag; ?>" name="uren_<?php echo $dag; ?>" min="0" max="8" step="0.5" value="<?php echo esc_attr($is_edit_mode ? $ingediende_uren[$dag] : ''); ?>">
                             </dd>
                         </div>
                     <?php endforeach; ?>

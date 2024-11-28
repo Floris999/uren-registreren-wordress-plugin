@@ -141,7 +141,7 @@ function hours_registration_admin_page()
                     $totaal_uren = 0;
                     foreach ($uren as $dag => $uren_per_dag) {
                         $ingediende_uren .= ucfirst($dag) . ': ' . esc_html($uren_per_dag) . ' uur<br>';
-                        $totaal_uren += (int)$uren_per_dag;
+                        $totaal_uren += (float)$uren_per_dag;
                     }
 
                     echo '<tr>';

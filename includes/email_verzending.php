@@ -41,7 +41,6 @@ function send_hours_submission_email_custom_table($record_id)
 
     $extra_notification_email = get_user_meta($opdrachtgever_id, 'notificatie_mail_2', true);
 
-
     $uren = json_decode($uren_data->uren, true);
 
     $uren_leesbaar = '';
@@ -49,7 +48,7 @@ function send_hours_submission_email_custom_table($record_id)
     foreach ($uren as $dag => $uren_per_dag) {
         if (!empty($uren_per_dag)) {
             $uren_leesbaar .= ucfirst($dag) . ': ' . $uren_per_dag . ' uur<br>';
-            $totaal_uren += (int)$uren_per_dag;
+            $totaal_uren += (float)$uren_per_dag;
         }
     }
 
@@ -95,7 +94,7 @@ function send_opdrachtgever_submission_email($kandidaat_id, $weeknummer, $year, 
     $totaal_uren = 0;
     foreach ($uren as $dag => $uren_per_dag) {
         $uren_leesbaar .= ucfirst($dag) . ': ' . esc_html($uren_per_dag) . ' uur<br>';
-        $totaal_uren += (int)$uren_per_dag;
+        $totaal_uren += (float)$uren_per_dag;
     }
 
     $subject = 'Uren aangepast ';

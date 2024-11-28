@@ -144,8 +144,9 @@ function hours_registration_client_dashboard()
                                 $totaal_uren = 0;
                                 foreach ($uren as $dag => $uren_per_dag) {
                                     $ingediende_uren .= ucfirst($dag) . ': ' . esc_html($uren_per_dag) . ' uur<br>';
-                                    $totaal_uren += (int)$uren_per_dag;
+                                    $totaal_uren += (float)$uren_per_dag;
                                 }
+
                                 list($start_date, $end_date) = get_start_and_end_date($weeknummer, date('Y'));
                 ?>
                                 <tr>
