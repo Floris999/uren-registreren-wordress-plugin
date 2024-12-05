@@ -116,7 +116,7 @@ function hours_registration_client_dashboard()
                             </span>
                         </a>
                     </th>
-                    <th class="px-6 py-4 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase">Weekdatum</th>
+                    <th class="px-6 py-4 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase">Jaar</th>
                     <th class="px-6 py-4 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase">Ingediende uren</th>
                     <th class="px-6 py-4 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase">Totaal uren</th>
                     <th class="px-6 py-4 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase">Status</th>
@@ -131,6 +131,7 @@ function hours_registration_client_dashboard()
                         $entry_id = $row['id'];
                         $user_id = $row['user_id'];
                         $weeknummer = $row['weeknummer'];
+                        $jaar = $row['jaar'];
                         $uren = json_decode($row['uren'], true);
                         $status = $row['status'] ?: 'in afwachting';
                         $datum_aangevraagd = isset($row['date']) ? date('d-m-Y', strtotime($row['date'])) : 'Onbekend';
@@ -152,10 +153,7 @@ function hours_registration_client_dashboard()
                                 <tr>
                                     <td class="px-2 py-4 text-center text-sm whitespace-nowrap"><?php echo esc_html($naam); ?></td>
                                     <td class="px-2 py-4 text-center text-sm whitespace-nowrap"><?php echo esc_html($weeknummer); ?></td>
-                                    <td class="px-2 py-4 text-center text-sm whitespace-nowrap">
-                                        <?php echo esc_html($start_date); ?><br>
-                                        <?php echo esc_html($end_date); ?>
-                                    </td>
+                                    <td class="px-2 py-4 text-center text-sm whitespace-nowrap"><?php echo esc_html($jaar); ?></td>
                                     <td class="px-2 py-4 text-center text-sm whitespace-nowrap">
                                         <?php echo $ingediende_uren; ?>
                                     </td>
