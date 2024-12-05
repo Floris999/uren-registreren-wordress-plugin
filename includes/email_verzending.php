@@ -52,12 +52,12 @@ function send_hours_submission_email_custom_table($record_id)
         }
     }
 
-    list($start_date, $end_date) = get_start_and_end_date($uren_data->weeknummer, date('Y'));
+    $jaar = $uren_data->jaar;
 
     $subject = 'Nieuwe uren ingediend door ' . $user_name;
 
     $message = 'Beste ' . $opdrachtgever_info->display_name . ",\n\n";
-    $message .= 'Er zijn nieuwe uren ingediend door ' . $user_name . " voor week " . $uren_data->weeknummer . " (van " . $start_date . " tot " . $end_date . "):\n\n";
+    $message .= 'Er zijn nieuwe uren ingediend door ' . $user_name . " voor week " . $uren_data->weeknummer . " jaartal " . $jaar . ":\n\n";
     $message .= $uren_leesbaar;
     $message .= "\n\nTotaal aantal uren: " . $totaal_uren . " uur";
     $message .= "\n\nIn ons portaal kun je de ingediende uren goedkeuren of evt. eenmalig aanpassen: " . site_url('/wp-admin') . "\n\n";
@@ -74,7 +74,7 @@ function send_hours_submission_email_custom_table($record_id)
     }
 }
 
-function send_opdrachtgever_submission_email($kandidaat_id, $weeknummer, $year, $uren)
+function send_opdrachtgever_submission_email($kandidaat_id, $weeknummer, $jaar, $uren)
 {
     $saved_email = get_option('urenregistratie_notification_email', '');
     if (!$saved_email) {
@@ -88,8 +88,6 @@ function send_opdrachtgever_submission_email($kandidaat_id, $weeknummer, $year, 
     $opdrachtgever_info = get_userdata($opdrachtgever_id);
     $opdrachtgever_name = $opdrachtgever_info ? $opdrachtgever_info->display_name : 'Onbekende opdrachtgever';
 
-    list($start_date, $end_date) = get_start_and_end_date($weeknummer, $year);
-
     $uren_leesbaar = '';
     $totaal_uren = 0;
     foreach ($uren as $dag => $uren_per_dag) {
@@ -99,7 +97,7 @@ function send_opdrachtgever_submission_email($kandidaat_id, $weeknummer, $year, 
 
     $subject = 'Uren aangepast ';
     $message = 'Beste beheerder' .  ",<br><br>";
-    $message .= 'De uren van ' . $user_name . ' voor week ' . $weeknummer . ' (van ' . $start_date . ' tot ' . $end_date . ') zijn aangepast door opdrachtgever ' . $opdrachtgever_name . '.<br><br>';
+    $message .= 'De uren van ' . $user_name . ' voor week ' . $weeknummer . ' jaartal ' . $jaar . ' zijn aangepast door opdrachtgever ' . $opdrachtgever_name . '.<br><br>';
     $message .= 'Hier is een overzicht van de aangepaste uren:<br><br>';
     $message .= $uren_leesbaar;
     $message .= '<br><br>Totaal aantal uren: ' . $totaal_uren . ' uur<br><br>';
